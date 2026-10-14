@@ -1,0 +1,2290 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECE &amp; Embedded Systems Masterclass | Arduino Mega 2560 vs. Arduino Due</title>
+  <style>
+    :root {
+      --bg-primary: #0b1020;
+      --bg-secondary: #121a30;
+      --bg-card: #17223d;
+      --bg-elevated: #1e2c4f;
+      --text-primary: #ecf2ff;
+      --text-secondary: #a8b8da;
+      --text-muted: #7689b5;
+      --accent-mega: #00b8d9;
+      --accent-due: #ff8b00;
+      --accent-primary: #38bdf8;
+      --accent-success: #22c55e;
+      --accent-warning: #f59e0b;
+      --accent-danger: #ef4444;
+      --border-color: #283a66;
+      --code-bg: #080d1a;
+      --shadow: 0 8px 28px rgba(0, 0, 0, 0.38);
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    }
+
+    html[data-theme="light"] {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #eef2f6;
+      --bg-card: #ffffff;
+      --bg-elevated: #f1f5f9;
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --accent-mega: #0284c7;
+      --accent-due: #d97706;
+      --accent-primary: #0369a1;
+      --accent-success: #16a34a;
+      --accent-warning: #d97706;
+      --accent-danger: #dc2626;
+      --border-color: #cbd5e1;
+      --code-bg: #0f172a;
+      --shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-family: var(--font-sans);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.65;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    /* Sticky Top Navigation */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(11, 16, 32, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.65rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    html[data-theme="light"] .topbar {
+      background: rgba(255, 255, 255, 0.94);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, var(--accent-mega), var(--accent-due));
+      color: #fff;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+      background: var(--bg-elevated);
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .btn {
+      cursor: pointer;
+      border: 1px solid var(--border-color);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      padding: 0.42rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #ffffff;
+      border: none;
+    }
+
+    /* Hero Header */
+    .hero {
+      background: radial-gradient(circle at 85% 20%, rgba(255, 139, 0, 0.14), transparent 45%),
+                  radial-gradient(circle at 15% 80%, rgba(0, 184, 217, 0.16), transparent 50%),
+                  var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 3rem 1.5rem;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .meta-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+
+    .pill {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--accent-primary);
+    }
+
+    .pill-mega {
+      color: var(--accent-mega);
+      border-color: var(--accent-mega);
+    }
+
+    .pill-due {
+      color: var(--accent-due);
+      border-color: var(--accent-due);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.8rem, 3.5vw, 2.75rem);
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      font-weight: 800;
+    }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 920px;
+      margin-bottom: 1.75rem;
+    }
+
+    .objectives-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .obj-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-primary);
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .obj-card h4 {
+      font-size: 0.9rem;
+      margin-bottom: 0.35rem;
+      color: var(--accent-primary);
+    }
+
+    .obj-card p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* Section Styling */
+    section {
+      padding: 3rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-header {
+      margin-bottom: 2rem;
+    }
+
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--accent-primary);
+      font-weight: 700;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.45rem, 2.5vw, 2rem);
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    /* Grid Layouts & Cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .card h3 {
+      font-size: 1.18rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card p, .card li {
+      color: var(--text-secondary);
+      font-size: 0.93rem;
+    }
+
+    .card ul, .card ol {
+      padding-left: 1.25rem;
+      margin-top: 0.5rem;
+    }
+
+    .card li {
+      margin-bottom: 0.45rem;
+    }
+
+    /* Alert / Callout Boxes */
+    .callout {
+      border-radius: 10px;
+      padding: 1.15rem 1.35rem;
+      margin: 1.25rem 0;
+      border-left: 5px solid;
+      background: var(--bg-elevated);
+    }
+
+    .callout-danger {
+      border-left-color: var(--accent-danger);
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .callout-warning {
+      border-left-color: var(--accent-warning);
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    .callout-info {
+      border-left-color: var(--accent-mega);
+      background: rgba(0, 184, 217, 0.1);
+    }
+
+    .callout-title {
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      margin: 1.25rem 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      font-size: 0.88rem;
+    }
+
+    th, td {
+      padding: 0.85rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background: var(--bg-elevated);
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    tr:hover td {
+      background: rgba(56, 189, 248, 0.04);
+    }
+
+    /* Code Blocks */
+    pre {
+      background: var(--code-bg);
+      color: #e2e8f0;
+      padding: 1.1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      border: 1px solid var(--border-color);
+      margin: 0.85rem 0;
+      line-height: 1.55;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.84em;
+      background: var(--bg-elevated);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      color: var(--accent-primary);
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+
+    /* Formula Display */
+    .formula-box {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-due);
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      margin: 0.85rem 0;
+      overflow-x: auto;
+    }
+
+    /* Interactive Pinout Filter */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .filter-btn {
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+
+    .filter-btn.active {
+      background: var(--accent-primary);
+      color: #0b1020;
+      border-color: var(--accent-primary);
+    }
+
+    .pin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 0.85rem;
+    }
+
+    .pin-item {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.85rem;
+      font-size: 0.84rem;
+    }
+
+    .pin-item .pin-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.4rem;
+    }
+
+    .badge-mega { background: rgba(0, 184, 217, 0.2); color: var(--accent-mega); }
+    .badge-due { background: rgba(255, 139, 0, 0.2); color: var(--accent-due); }
+    .badge-both { background: rgba(34, 197, 94, 0.2); color: var(--accent-success); }
+
+    /* Interactive Calculators */
+    .calc-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      margin-top: 0.75rem;
+    }
+
+    .calc-group label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .calc-group input, .calc-group select {
+      padding: 0.55rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+    }
+
+    .calc-result {
+      margin-top: 0.85rem;
+      padding: 0.85rem;
+      border-radius: 8px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+    }
+
+    /* Canvas Visualizers */
+    canvas {
+      width: 100%;
+      height: 270px;
+      background: #070b16;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      display: block;
+      margin-top: 0.75rem;
+    }
+
+    /* Accordion Interview Questions */
+    .accordion-item {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      background: var(--bg-card);
+      overflow: hidden;
+    }
+
+    .accordion-header {
+      width: 100%;
+      text-align: left;
+      padding: 1rem 1.25rem;
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .accordion-header:hover {
+      background: rgba(56, 189, 248, 0.1);
+    }
+
+    .accordion-body {
+      display: none;
+      padding: 1.25rem;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+    }
+
+    .accordion-item.open .accordion-body {
+      display: block;
+    }
+
+    /* Quiz Styling */
+    .quiz-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.35rem;
+      margin-bottom: 1.15rem;
+    }
+
+    .quiz-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin: 0.9rem 0;
+    }
+
+    .quiz-option {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.65rem 0.9rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-elevated);
+      cursor: pointer;
+      font-size: 0.88rem;
+    }
+
+    .quiz-option:hover {
+      border-color: var(--accent-primary);
+    }
+
+    .quiz-feedback {
+      display: none;
+      margin-top: 0.85rem;
+      padding: 0.9rem;
+      border-radius: 6px;
+      font-size: 0.86rem;
+    }
+
+    .svg-diagram {
+      width: 100%;
+      height: auto;
+      background: #080d1a;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    footer {
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      background: var(--bg-secondary);
+    }
+
+    /* Print-Friendly Stylesheet */
+    @media print {
+      .topbar, .action-btns, .filter-bar, .btn {
+        display: none !important;
+      }
+      html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      .card, .obj-card, .quiz-card, .accordion-item, table, th, td {
+        background: #ffffff !important;
+        color: #000000 !important;
+        border-color: #999999 !important;
+        box-shadow: none !important;
+      }
+      .accordion-body, .quiz-feedback {
+        display: block !important;
+      }
+      section {
+        page-break-inside: avoid;
+        padding: 1.25rem 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAVIGATION -->
+  <nav class="topbar">
+    <a href="#top" class="brand">
+      <span class="brand-badge">ECE-MCU</span>
+      <span>Mega 2560 vs. Due Masterclass</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#intro">1. Overview</a></li>
+      <li><a href="#architecture">2. Architecture &amp; Pinout</a></li>
+      <li><a href="#principles">3. Peripherals &amp; Safety</a></li>
+      <li><a href="#waveforms">4. Waveforms &amp; Timing</a></li>
+      <li><a href="#math">5. Formulas &amp; Calculators</a></li>
+      <li><a href="#examples">6. Solved Problems</a></li>
+      <li><a href="#quiz">7. GATE/MCU Quiz</a></li>
+      <li><a href="#interview">8. Interview Prep</a></li>
+      <li><a href="#applications">9. Industry &amp; Cheatsheet</a></li>
+    </ul>
+    <div class="action-btns">
+      <button class="btn" onclick="toggleTheme()" title="Switch Dark/Light Mode">🌗 Theme</button>
+      <button class="btn" onclick="window.print()" title="Print or Save as PDF">🖨️ Print PDF</button>
+      <button class="btn btn-primary" onclick="downloadSelf()" title="Download Standalone HTML">⬇️ Download .HTML</button>
+    </div>
+  </nav>
+
+  <!-- HERO HEADER -->
+  <header class="hero" id="top">
+    <div class="container">
+      <div class="meta-pills">
+        <span class="pill">Subject: Embedded Systems &amp; Microcontroller Architecture</span>
+        <span class="pill">Unit: Advanced 8-bit &amp; 32-bit Platforms</span>
+        <span class="pill pill-mega">ATmega2560 (8-Bit AVR, 5V, 16 MHz)</span>
+        <span class="pill pill-due">ATSAM3X8E (32-Bit ARM Cortex-M3, 3.3V, 84 MHz)</span>
+      </div>
+      <h1>Introduction to Arduino Mega 2560 &amp; Arduino Due</h1>
+      <p class="hero-sub">
+        A rigorous architectural comparison of high-pinout 8-bit AVR and high-throughput 32-bit ARM Cortex-M3 platforms—covering internal bus structures, memory maps, DMA, true DAC output, electrical overvoltage constraints, register-level timing calculations, and core hardware interview preparation.
+      </p>
+
+      <div class="objectives-grid">
+        <div class="obj-card">
+          <h4>🎯 Architectural Mastery</h4>
+          <p>Contrast the 8-bit AVR Modified Harvard pipeline (ATmega2560) against the 32-bit ARM Cortex-M3 Harvard bus matrix with unified 4 GB linear addressing (ATSAM3X8E).</p>
+        </div>
+        <div class="obj-card">
+          <h4>⚡ Electrical &amp; Logic Safety</h4>
+          <p>Design safe level-shifting circuits between 5V legacy sensors and 3.3V CMOS I/O pins while respecting strict 3 mA / 15 mA vs. 20 mA / 40 mA current limits.</p>
+        </div>
+        <div class="obj-card">
+          <h4>🎛️ Peripheral Engineering</h4>
+          <p>Configure multi-UART gateways, 10-bit vs. 12-bit SAR ADCs, Dual 12-bit true analog DACs, CAN bus controllers, and CPU-offloaded DMA channels.</p>
+        </div>
+        <div class="obj-card">
+          <h4>📐 Quantitative Design</h4>
+          <p>Compute exact baud-rate UBRR clock errors, timer prescalers, ADC quantization resolution (LSB), and ISR atomic access cycles for competitive exams and industry interviews.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SECTION 1: INTRODUCTION & LEARNING OBJECTIVES -->
+  <section id="intro">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Section 01 // Foundations &amp; Classification</span>
+        <h2 class="section-title">Topic Introduction, Core Principles &amp; Terminology</h2>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>🏛️ Historical Context &amp; Platform Evolution</h3>
+          <p>
+            While the flagship Arduino Uno (ATmega328P) popularized rapid embedded prototyping with 14 digital pins and 32 KB of Flash, complex systems such as 3D printers, CNC controllers, autonomous rovers, and real-time DSP audio engines quickly exhausted its I/O count, SRAM (2 KB), and 16 MHz 8-bit ALU throughput.
+          </p>
+          <ul>
+            <li><strong>Arduino Mega 2560 (Released 2010):</strong> Scales the 5V 8-bit AVR RISC architecture to an expansive 100-pin TQFP <strong>ATmega2560</strong> microcontroller—delivering 54 digital I/O pins, 16 analog inputs, 4 hardware USARTs, and 256 KB Flash while maintaining 100% 5V shield and logic compatibility.</li>
+            <li><strong>Arduino Due (Released 2012):</strong> Marks Arduino's milestone leap into 32-bit ARM microcontrollers. Powered by the Atmel/Microchip <strong>ATSAM3X8E (ARM Cortex-M3)</strong> running at 84 MHz in the identical Mega footprint, it introduces a 32-bit datapath, 96 KB SRAM, Dual 12-bit true DACs, Dual CAN 2.0A/B controllers, USB OTG, and a central DMA engine—at the critical cost of shifting to strict <strong>3.3V CMOS logic levels</strong>.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>⚙️ Core Operating Principles: 8-bit AVR vs. 32-bit ARM</h3>
+          <ul>
+            <li><strong>ATmega2560 (8-bit AVR RISC):</strong> Uses a strict <strong>Modified Harvard Architecture</strong> with physically separate address spaces and buses for 256 KB Flash (16-bit word-addressed) and 8 KB SRAM (8-bit byte-addressed). The CPU features 32 × 8-bit general-purpose working registers (<code>R0–R31</code>) directly tied to the 8-bit ALU, executing most single-byte instructions in 1 clock cycle (16 MIPS at 16 MHz) via a 2-stage fetch/execute pipeline.</li>
+            <li><strong>ATSAM3X8E (32-bit ARM Cortex-M3):</strong> Uses a <strong>3-stage pipeline Harvard core</strong> (Instruction Fetch, Decode, Execute) coupled to a multi-layer AHB bus matrix (I-Code, D-Code, and System buses) mapped into a single <strong>Unified 4 GB Linear Address Space</strong> (<code>0x0000_0000</code> to <code>0xFFFF_FFFF</code>). It executes the high-density 16/32-bit <strong>Thumb-2 instruction set</strong>, includes single-cycle 32×32 hardware multiplication and hardware division, and achieves ~105 DMIPS (1.25 DMIPS/MHz at 84 MHz).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top: 1.5rem;">
+        <div class="card">
+          <h3>📚 Prerequisite Concepts</h3>
+          <ul>
+            <li><strong>C/C++ Bitwise &amp; Pointer Manipulation:</strong> Register bitmasking (<code>|= (1 &lt;&lt; n)</code>, <code>&amp;= ~(1 &lt;&lt; n)</code>), <code>volatile</code> qualifier for memory-mapped I/O, and fixed-width integers (<code>uint8_t</code>, <code>uint32_t</code>).</li>
+            <li><strong>Digital Electronics &amp; CMOS Logic Thresholds:</strong> Understanding $V_{IH}$, $V_{IL}$, $V_{OH}$, $V_{OL}$, push-pull vs. open-drain outputs, and pull-up/pull-down resistors.</li>
+            <li><strong>DC Circuit Fundamentals:</strong> Ohm's Law ($V = I \times R$), resistive voltage dividers, RC time constants ($\tau = R \cdot C$), and current sourcing vs. sinking.</li>
+            <li><strong>Microprocessor vs. Microcontroller:</strong> SoC integration of CPU core, non-volatile Flash, SRAM, timers, and analog peripherals on a single silicon die.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>🗂️ Architectural Classification Matrix</h3>
+          <ul>
+            <li><strong>8-Bit AVR Mega Family (ATmega328P, ATmega2560):</strong> 5V native CMOS process, deterministic cycle timing without cache/bus contention, internal 4 KB byte-addressable EEPROM, high pin drive capability (up to 20 mA continuous, 40 mA absolute max), no DMA, no hardware floating-point or 32-bit ALU.</li>
+            <li><strong>32-Bit ARM Cortex-M Family (SAM3X8E Cortex-M3, SAMD21 M0+, RA4M1 M4):</strong> 3.3V low-voltage CMOS geometry, Nested Vectored Interrupt Controller (NVIC) with hardware tail-chaining (12-cycle latency), peripheral DMA (PDC + AHB DMA), native 32-bit arithmetic, high-speed 1 MSPS 12-bit SAR ADC and 12-bit DAC, low GPIO current drive (3 mA to 15 mA max).</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Key Terminology Table -->
+      <div class="card" style="margin-top: 1.5rem;">
+        <h3>🔑 Essential Embedded Systems Terminology</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Term</th>
+                <th>Architectural Definition</th>
+                <th>Mega 2560 Implementation</th>
+                <th>Due (SAM3X8E) Implementation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Flash Memory</strong></td>
+                <td>Non-volatile program storage holding firmware instructions and constant data.</td>
+                <td>256 KB (8 KB reserved for bootloader); requires <code>PROGMEM</code> &amp; <code>pgm_read_byte()</code> to read constants.</td>
+                <td>512 KB (Dual 256 KB banks); directly readable via normal C pointers in unified memory map.</td>
+              </tr>
+              <tr>
+                <td><strong>SRAM</strong></td>
+                <td>Volatile Static RAM storing stack, heap, global/static variables at runtime.</td>
+                <td>8 KB homogeneous block (<code>0x0200–0x21FF</code>).</td>
+                <td>96 KB total split into 64 KB SRAM0 + 32 KB SRAM1 (contiguous at <code>0x20070000</code>).</td>
+              </tr>
+              <tr>
+                <td><strong>EEPROM</strong></td>
+                <td>Byte-erasable non-volatile memory for calibration parameters and configuration.</td>
+                <td>4 KB dedicated hardware EEPROM inside ATmega2560 (100,000 write cycles).</td>
+                <td><strong>None (0 KB)</strong>; emulated in Flash (erased on re-upload) or external I2C/SPI EEPROM.</td>
+              </tr>
+              <tr>
+                <td><strong>DMA</strong></td>
+                <td>Direct Memory Access controller that transfers data between peripherals and RAM without CPU intervention.</td>
+                <td>Not supported (every byte transfer requires CPU interrupt/polling overhead).</td>
+                <td>22-channel Peripheral DMA Controller (PDC) + 6-channel central AHB DMA controller.</td>
+              </tr>
+              <tr>
+                <td><strong>DAC</strong></td>
+                <td>Digital-to-Analog Converter generating continuous, true analog voltage levels.</td>
+                <td>None (<code>analogWrite()</code> outputs 490/980 Hz digital PWM only).</td>
+                <td>Dual 12-bit True DACs on pins <code>DAC0</code> &amp; <code>DAC1</code> (0.55V–2.75V analog swing).</td>
+              </tr>
+              <tr>
+                <td><strong>CAN Bus</strong></td>
+                <td>Controller Area Network differential serial protocol (ISO 11898) for automotive/industrial nodes.</td>
+                <td>None (requires external SPI controller like MCP2515).</td>
+                <td>Dual built-in CAN 2.0A/B controllers (<code>CANRX0/CANTX0</code>, <code>CANRX1/CANTX1</code>; requires external 3.3V transceiver).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: ARCHITECTURE, BLOCK DIAGRAMS & PINOUT -->
+  <section id="architecture">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Section 02 // Hardware Architecture &amp; Pinout</span>
+        <h2 class="section-title">System Block Diagrams, Pinout Explorer &amp; Specifications</h2>
+      </div>
+
+      <div class="grid-2">
+        <!-- SVG Block Diagram: Arduino Mega 2560 -->
+        <div class="card">
+          <h3 style="color: var(--accent-mega);">🟦 Arduino Mega 2560 Architectural Block Diagram</h3>
+          <p>8-Bit AVR RISC Modified Harvard Architecture running at 16 MHz with 5V CMOS I/O banks.</p>
+          <svg class="svg-diagram" viewBox="0 0 600 410" xmlns="http://www.w3.org/2000/svg">
+            <rect width="600" height="410" rx="8" fill="#070c18"/>
+            <!-- Power & Clock -->
+            <rect x="20" y="20" width="145" height="75" rx="6" fill="#132238" stroke="#00b8d9" stroke-width="1.5"/>
+            <text x="92" y="42" fill="#00b8d9" font-size="11" font-weight="bold" text-anchor="middle">POWER SUBSYSTEM</text>
+            <text x="92" y="60" fill="#cbd5e1" font-size="10" text-anchor="middle">VIN (7-12V) → 5V LDO</text>
+            <text x="92" y="76" fill="#cbd5e1" font-size="10" text-anchor="middle">3.3V LDO (150mA max)</text>
+
+            <rect x="20" y="110" width="145" height="75" rx="6" fill="#132238" stroke="#00b8d9" stroke-width="1.5"/>
+            <text x="92" y="132" fill="#00b8d9" font-size="11" font-weight="bold" text-anchor="middle">USB-SERIAL BRIDGE</text>
+            <text x="92" y="150" fill="#cbd5e1" font-size="10" text-anchor="middle">ATmega16U2 (16 MHz)</text>
+            <text x="92" y="166" fill="#94a3b8" font-size="9.5" text-anchor="middle">USB ↔ UART0 (PE0/PE1)</text>
+
+            <rect x="20" y="200" width="145" height="65" rx="6" fill="#132238" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="92" y="222" fill="#38bdf8" font-size="11" font-weight="bold" text-anchor="middle">CLOCK OSCILLATOR</text>
+            <text x="92" y="242" fill="#cbd5e1" font-size="10" text-anchor="middle">16 MHz Ceramic/XTAL</text>
+            <text x="92" y="256" fill="#94a3b8" font-size="9" text-anchor="middle">T_clk = 62.5 ns (16 MIPS)</text>
+
+            <!-- Central ATmega2560 Core -->
+            <rect x="195" y="20" width="210" height="245" rx="8" fill="#162944" stroke="#00b8d9" stroke-width="2.5"/>
+            <text x="300" y="44" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">ATmega2560-16AU</text>
+            <text x="300" y="60" fill="#00b8d9" font-size="10" text-anchor="middle">8-Bit AVR RISC Core (5V Logic)</text>
+
+            <rect x="210" y="72" width="180" height="46" rx="4" fill="#0c172a" stroke="#283a66"/>
+            <text x="300" y="91" fill="#f8fafc" font-size="10" font-weight="bold" text-anchor="middle">32 × 8-Bit GP Registers</text>
+            <text x="300" y="107" fill="#94a3b8" font-size="9" text-anchor="middle">8-Bit ALU + 8x8 HW Multiplier</text>
+
+            <rect x="210" y="126" width="180" height="66" rx="4" fill="#0c172a" stroke="#283a66"/>
+            <text x="300" y="144" fill="#38bdf8" font-size="10" font-weight="bold" text-anchor="middle">SEPARATE MEMORY BUSES</text>
+            <text x="300" y="160" fill="#cbd5e1" font-size="9.5" text-anchor="middle">Flash: 256 KB (16-bit Bus)</text>
+            <text x="300" y="174" fill="#cbd5e1" font-size="9.5" text-anchor="middle">SRAM: 8 KB | EEPROM: 4 KB</text>
+
+            <rect x="210" y="200" width="180" height="52" rx="4" fill="#0c172a" stroke="#283a66"/>
+            <text x="300" y="218" fill="#22c55e" font-size="10" font-weight="bold" text-anchor="middle">TIMERS &amp; INTERRUPTS</text>
+            <text x="300" y="233" fill="#cbd5e1" font-size="9.5" text-anchor="middle">2× 8-bit, 4× 16-bit Timers</text>
+            <text x="300" y="246" fill="#94a3b8" font-size="9" text-anchor="middle">6 Ext INTx + 24 PCINT Pins</text>
+
+            <!-- Right Peripherals -->
+            <rect x="435" y="20" width="145" height="115" rx="6" fill="#132238" stroke="#00b8d9" stroke-width="1.5"/>
+            <text x="507" y="42" fill="#00b8d9" font-size="11" font-weight="bold" text-anchor="middle">DIGITAL I/O (54 PINS)</text>
+            <text x="507" y="60" fill="#cbd5e1" font-size="9.5" text-anchor="middle">Ports A–L (5V Push-Pull)</text>
+            <text x="507" y="76" fill="#cbd5e1" font-size="9.5" text-anchor="middle">15 PWM Channels (8-bit)</text>
+            <text x="507" y="92" fill="#22c55e" font-size="9.5" text-anchor="middle">Max Current: 20mA rec</text>
+            <text x="507" y="108" fill="#ef4444" font-size="9" text-anchor="middle">(40mA Absolute Max)</text>
+
+            <rect x="435" y="150" width="145" height="115" rx="6" fill="#132238" stroke="#00b8d9" stroke-width="1.5"/>
+            <text x="507" y="172" fill="#00b8d9" font-size="11" font-weight="bold" text-anchor="middle">ANALOG SUBSYSTEM</text>
+            <text x="507" y="190" fill="#cbd5e1" font-size="9.5" text-anchor="middle">16-Ch MUX → 1 SAR ADC</text>
+            <text x="507" y="206" fill="#cbd5e1" font-size="9.5" text-anchor="middle">10-Bit (0–1023 Steps)</text>
+            <text x="507" y="222" fill="#cbd5e1" font-size="9.5" text-anchor="middle">~15 kSPS Max @ 10-bit</text>
+            <text x="507" y="238" fill="#f59e0b" font-size="9.5" text-anchor="middle">No True DAC (0 Ch)</text>
+
+            <!-- Bottom Serial Bus -->
+            <rect x="20" y="285" width="560" height="105" rx="6" fill="#132238" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="300" y="308" fill="#38bdf8" font-size="11.5" font-weight="bold" text-anchor="middle">8-BIT INTERNAL DATA BUS ↔ SERIAL COMMUNICATION INTERFACES</text>
+            <text x="150" y="335" fill="#cbd5e1" font-size="10" text-anchor="middle">4× Hardware USARTs (Serial0–3)</text>
+            <text x="150" y="352" fill="#94a3b8" font-size="9.5" text-anchor="middle">Pins: 0/1, 18/19, 16/17, 14/15</text>
+            <text x="450" y="335" fill="#cbd5e1" font-size="10" text-anchor="middle">1× SPI (Pins 50–53 + ICSP)</text>
+            <text x="450" y="352" fill="#cbd5e1" font-size="10" text-anchor="middle">1× I2C / TWI (Pins 20 SDA, 21 SCL)</text>
+            <text x="300" y="376" fill="#f59e0b" font-size="9.5" text-anchor="middle">Note: No DMA Controller | No Native USB OTG | No CAN Controller</text>
+          </svg>
+        </div>
+
+        <!-- SVG Block Diagram: Arduino Due -->
+        <div class="card">
+          <h3 style="color: var(--accent-due);">🟧 Arduino Due Architectural Block Diagram</h3>
+          <p>32-Bit ARM Cortex-M3 Harvard Bus Matrix running at 84 MHz with strict 3.3V CMOS I/O.</p>
+          <svg class="svg-diagram" viewBox="0 0 600 410" xmlns="http://www.w3.org/2000/svg">
+            <rect width="600" height="410" rx="8" fill="#070c18"/>
+            <!-- Power & Dual USB -->
+            <rect x="20" y="20" width="145" height="75" rx="6" fill="#231c18" stroke="#ff8b00" stroke-width="1.5"/>
+            <text x="92" y="42" fill="#ff8b00" font-size="11" font-weight="bold" text-anchor="middle">3.3V POWER RAIL</text>
+            <text x="92" y="59" fill="#cbd5e1" font-size="9.5" text-anchor="middle">VIN → 5V Buck → 3.3V LDO</text>
+            <text x="92" y="75" fill="#ef4444" font-size="9.5" font-weight="bold" text-anchor="middle">⚠️ 3.3V ONLY I/O (800mA)</text>
+
+            <rect x="20" y="110" width="145" height="75" rx="6" fill="#231c18" stroke="#ff8b00" stroke-width="1.5"/>
+            <text x="92" y="130" fill="#ff8b00" font-size="10.5" font-weight="bold" text-anchor="middle">DUAL USB INTERFACES</text>
+            <text x="92" y="148" fill="#cbd5e1" font-size="9.5" text-anchor="middle">1. Prog USB (ATmega16U2)</text>
+            <text x="92" y="164" fill="#22c55e" font-size="9.5" text-anchor="middle">2. Native USB OTG (480Mbps)</text>
+
+            <rect x="20" y="200" width="145" height="65" rx="6" fill="#231c18" stroke="#f59e0b" stroke-width="1.5"/>
+            <text x="92" y="222" fill="#f59e0b" font-size="11" font-weight="bold" text-anchor="middle">CLOCK SYNTHESIZER</text>
+            <text x="92" y="240" fill="#cbd5e1" font-size="9.5" text-anchor="middle">12 MHz XTAL → PLL → 84 MHz</text>
+            <text x="92" y="255" fill="#94a3b8" font-size="9" text-anchor="middle">+ 32.768 kHz RTC Crystal</text>
+
+            <!-- Central ATSAM3X8E Core -->
+            <rect x="195" y="20" width="210" height="245" rx="8" fill="#2a1f18" stroke="#ff8b00" stroke-width="2.5"/>
+            <text x="300" y="44" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">ATSAM3X8E (144-LQFP)</text>
+            <text x="300" y="60" fill="#ff8b00" font-size="10" text-anchor="middle">32-Bit ARM Cortex-M3 @ 84 MHz</text>
+
+            <rect x="210" y="72" width="180" height="46" rx="4" fill="#0c172a" stroke="#4b3621"/>
+            <text x="300" y="90" fill="#f8fafc" font-size="10" font-weight="bold" text-anchor="middle">32-Bit ALU + Thumb-2 ISA</text>
+            <text x="300" y="106" fill="#94a3b8" font-size="9" text-anchor="middle">1-Cycle 32×32 MUL &amp; HW DIV</text>
+
+            <rect x="210" y="126" width="180" height="66" rx="4" fill="#0c172a" stroke="#4b3621"/>
+            <text x="300" y="143" fill="#ff8b00" font-size="10" font-weight="bold" text-anchor="middle">UNIFIED 4 GB MEMORY MAP</text>
+            <text x="300" y="159" fill="#cbd5e1" font-size="9.5" text-anchor="middle">Flash: 512 KB (2×256 KB)</text>
+            <text x="300" y="173" fill="#cbd5e1" font-size="9.5" text-anchor="middle">SRAM: 96 KB (64KB + 32KB)</text>
+            <text x="300" y="186" fill="#ef4444" font-size="8.5" text-anchor="middle">Internal EEPROM: 0 KB (None)</text>
+
+            <rect x="210" y="200" width="180" height="52" rx="4" fill="#0c172a" stroke="#4b3621"/>
+            <text x="300" y="218" fill="#22c55e" font-size="10" font-weight="bold" text-anchor="middle">MULTI-LAYER AHB + DMA</text>
+            <text x="300" y="233" fill="#cbd5e1" font-size="9.5" text-anchor="middle">Central DMA + 22-Ch PDC</text>
+            <text x="300" y="246" fill="#94a3b8" font-size="9" text-anchor="middle">NVIC + 9× 32-Bit Timer Ch</text>
+
+            <!-- Right Peripherals -->
+            <rect x="435" y="20" width="145" height="115" rx="6" fill="#231c18" stroke="#ff8b00" stroke-width="1.5"/>
+            <text x="507" y="42" fill="#ff8b00" font-size="11" font-weight="bold" text-anchor="middle">DIGITAL I/O (54 PINS)</text>
+            <text x="507" y="60" fill="#cbd5e1" font-size="9.5" text-anchor="middle">All 54 Pins Interrupt Capable</text>
+            <text x="507" y="76" fill="#cbd5e1" font-size="9.5" text-anchor="middle">12 PWM Pins (Up to 16-bit)</text>
+            <text x="507" y="92" fill="#f59e0b" font-size="9.5" text-anchor="middle">Drive: 3mA (Low) / 15mA (High)</text>
+            <text x="507" y="108" fill="#ef4444" font-size="9" text-anchor="middle">Total I/O Limit: 130 mA</text>
+
+            <rect x="435" y="150" width="145" height="115" rx="6" fill="#231c18" stroke="#ff8b00" stroke-width="1.5"/>
+            <text x="507" y="172" fill="#ff8b00" font-size="11" font-weight="bold" text-anchor="middle">12-BIT ANALOG ENGINE</text>
+            <text x="507" y="190" fill="#cbd5e1" font-size="9.5" text-anchor="middle">12 ADC Ch (12-Bit, 1 MSPS)</text>
+            <text x="507" y="206" fill="#22c55e" font-size="9.5" font-weight="bold" text-anchor="middle">2× True 12-Bit DAC (DAC0/1)</text>
+            <text x="507" y="222" fill="#cbd5e1" font-size="9" text-anchor="middle">DAC Range: 0.55V to 2.75V</text>
+            <text x="507" y="238" fill="#94a3b8" font-size="9" text-anchor="middle">DMA-Driven Stream Ready</text>
+
+            <!-- Bottom Serial & Automotive Bus -->
+            <rect x="20" y="285" width="560" height="105" rx="6" fill="#231c18" stroke="#ff8b00" stroke-width="1.5"/>
+            <text x="300" y="308" fill="#ff8b00" font-size="11.5" font-weight="bold" text-anchor="middle">32-BIT AHB/APB BUS MATRIX ↔ ADVANCED INTERFACES</text>
+            <text x="150" y="335" fill="#cbd5e1" font-size="10" text-anchor="middle">1× UART + 4× USART (Serial0–3)</text>
+            <text x="150" y="352" fill="#cbd5e1" font-size="10" text-anchor="middle">2× I2C/TWI (Pins 20/21 &amp; SDA1/SCL1)</text>
+            <text x="450" y="335" fill="#22c55e" font-size="10" font-weight="bold" text-anchor="middle">2× CAN 2.0A/B Controllers (CAN0/1)</text>
+            <text x="450" y="352" fill="#cbd5e1" font-size="10" text-anchor="middle">SPI Header + Extended Chip Select (4, 10, 52)</text>
+            <text x="300" y="376" fill="#38bdf8" font-size="9.5" text-anchor="middle">Hardware Quadrature Decoder | SSC (I2S Audio) | True Random Number Generator (TRNG)</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Critical Safety Callout -->
+      <div class="callout callout-danger">
+        <div class="callout-title">🚨 CRITICAL ELECTRICAL HAZARD: 3.3V OVERVOLTAGE ON ARDUINO DUE</div>
+        <p>
+          Unlike the Arduino Mega 2560 (which operates at <strong>5.0V</strong> and tolerates up to $V_{CC} + 0.5\text{V} = 5.5\text{V}$ on its I/O pins), the Arduino Due's <strong>ATSAM3X8E</strong> microcontroller is fabricated on a 3.3V CMOS process whose absolute maximum GPIO pin voltage is <strong>$V_{DDIO} + 0.3\text{V} = 3.6\text{V}$</strong>. Connecting a 5V digital output (such as an HC-SR04 ultrasonic sensor echo pin or 5V I2C pull-up) directly to any Arduino Due pin will forward-bias the internal ESD clamping diodes into the 3.3V rail and <strong>permanently destroy the SAM3X8E silicon</strong>.
+        </p>
+      </div>
+
+      <!-- Interactive Pinout Explorer -->
+      <div class="card" style="margin-top: 1.5rem;">
+        <h3>📌 Interactive Pinout &amp; Peripheral Mapping Explorer</h3>
+        <p style="margin-bottom: 1rem;">Filter shared physical headers and board-specific functions across the Mega 2560 and Due R3 footprint:</p>
+        <div class="filter-bar">
+          <button class="filter-btn active" onclick="filterPins('all', this)">All Pin Groups</button>
+          <button class="filter-btn" onclick="filterPins('power', this)">Power &amp; Reference</button>
+          <button class="filter-btn" onclick="filterPins('serial', this)">UART / I2C / SPI / CAN</button>
+          <button class="filter-btn" onclick="filterPins('analog', this)">ADC &amp; True DAC</button>
+          <button class="filter-btn" onclick="filterPins('pwm', this)">PWM &amp; Timers</button>
+          <button class="filter-btn" onclick="filterPins('interrupt', this)">External Interrupts</button>
+        </div>
+
+        <div class="pin-grid" id="pinGrid">
+          <div class="pin-item" data-cat="power">
+            <span class="pin-badge badge-both">POWER HEADER</span>
+            <h4>VIN, 5V, 3.3V, GND, IOREF</h4>
+            <p><strong>Mega:</strong> IOREF = 5V; 3.3V pin max 50–150 mA.<br><strong>Due:</strong> IOREF = 3.3V; 3.3V regulator supplies up to 800 mA.</p>
+          </div>
+          <div class="pin-item" data-cat="serial">
+            <span class="pin-badge badge-both">UART0–UART3</span>
+            <h4>Pins 0/1, 18/19, 16/17, 14/15</h4>
+            <p><strong>Serial:</strong> RX0 (0), TX0 (1)<br><strong>Serial1:</strong> RX1 (19), TX1 (18)<br><strong>Serial2:</strong> RX2 (17), TX2 (16)<br><strong>Serial3:</strong> RX3 (15), TX3 (14)</p>
+          </div>
+          <div class="pin-item" data-cat="serial">
+            <span class="pin-badge badge-both">I2C / TWI BUS</span>
+            <h4>Pins 20 (SDA), 21 (SCL) + SDA1/SCL1</h4>
+            <p><strong>Mega:</strong> Single TWI bus on 20/21 (5V pull-ups).<br><strong>Due:</strong> Wire (20/21 with 1.5kΩ pull-ups to 3.3V) + Wire1 (SDA1/SCL1 near AREF).</p>
+          </div>
+          <div class="pin-item" data-cat="serial">
+            <span class="pin-badge badge-both">SPI INTERFACE</span>
+            <h4>Pins 50–53 (Mega) vs. ICSP/SPI Header (Due)</h4>
+            <p><strong>Mega:</strong> MISO(50), MOSI(51), SCK(52), SS(53) + 6-pin ICSP.<br><strong>Due:</strong> Dedicated 6-pin center SPI header; HW CS on Pins 4, 10, 52.</p>
+          </div>
+          <div class="pin-item" data-cat="serial">
+            <span class="pin-badge badge-due">DUE EXCLUSIVE: CAN BUS</span>
+            <h4>Pins CANRX (68) &amp; CANTX (69)</h4>
+            <p>Built-in CAN0 controller mapped to bottom analog-row header (plus CAN1 on DAC1/D53 alt functions). Requires 3.3V CAN transceiver (e.g., SN65HVD230).</p>
+          </div>
+          <div class="pin-item" data-cat="analog">
+            <span class="pin-badge badge-both">ANALOG INPUTS (ADC)</span>
+            <h4>Pins A0–A15 (Mega) vs. A0–A11 (Due)</h4>
+            <p><strong>Mega:</strong> 16 channels (A0–A15), 10-bit (0–5V).<br><strong>Due:</strong> 12 channels (A0–A11), 12-bit (0–3.3V). Pins A12–A15 on Due become DAC0, DAC1, CANRX, CANTX.</p>
+          </div>
+          <div class="pin-item" data-cat="analog">
+            <span class="pin-badge badge-due">DUE EXCLUSIVE: TRUE DAC</span>
+            <h4>Pins DAC0 &amp; DAC1 (12-Bit Analog Out)</h4>
+            <p>True 12-bit Digital-to-Analog outputs (4096 levels). Output voltage range is $\frac{1}{6}V_{ADVREF}$ to $\frac{5}{6}V_{ADVREF}$ (0.55V to 2.75V), not 0–3.3V rail-to-rail!</p>
+          </div>
+          <div class="pin-item" data-cat="pwm">
+            <span class="pin-badge badge-both">PWM OUTPUTS</span>
+            <h4>Pins 2 to 13 (Both) + Pins 44–46 (Mega)</h4>
+            <p><strong>Mega:</strong> 15 PWM pins, 8-bit resolution (490 Hz; 980 Hz on Pins 4 &amp; 13).<br><strong>Due:</strong> 12 PWM pins (2–13), configurable up to 12-bit via <code>analogWriteResolution(12)</code> (1000 Hz default).</p>
+          </div>
+          <div class="pin-item" data-cat="interrupt">
+            <span class="pin-badge badge-mega">MEGA INTERRUPTS</span>
+            <h4>External INTx vs. Pin Change (PCINT)</h4>
+            <p><strong>6 External INT pins:</strong> Pins 2, 3, 18, 19, 20, 21.<br><strong>24 PCINT pins:</strong> Spread across Ports B, J, K (shared vector per 8-bit port).</p>
+          </div>
+          <div class="pin-item" data-cat="interrupt">
+            <span class="pin-badge badge-due">DUE INTERRUPTS</span>
+            <h4>All 54 Digital Pins (PIO Controller)</h4>
+            <p>Every single digital pin (D0–D53) on the Arduino Due supports direct hardware edge/level interrupts via <code>attachInterrupt(digitalPinToInterrupt(pin), ISR, mode)</code>.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comprehensive Hardware Comparison Table -->
+      <div class="card" style="margin-top: 1.5rem;">
+        <h3>📊 Comprehensive Hardware Specification Matrix</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Specification / Parameter</th>
+                <th style="color: var(--accent-mega);">Arduino Mega 2560 Rev3</th>
+                <th style="color: var(--accent-due);">Arduino Due</th>
+                <th>Engineering Impact / Design Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Microcontroller IC</strong></td>
+                <td>ATmega2560 (Microchip/Atmel)</td>
+                <td>ATSAM3X8E (Microchip/Atmel)</td>
+                <td>100-pin TQFP vs. 144-pin LQFP package.</td>
+              </tr>
+              <tr>
+                <td><strong>CPU Core &amp; Architecture</strong></td>
+                <td>8-Bit AVR RISC (Modified Harvard)</td>
+                <td>32-Bit ARM Cortex-M3 (Harvard Bus Matrix)</td>
+                <td>Due processes 32-bit integers in 1 cycle vs. 4+ cycles on Mega.</td>
+              </tr>
+              <tr>
+                <td><strong>System Clock Speed ($f_{clk}$)</strong></td>
+                <td>16 MHz ($T_{clk} = 62.5\text{ ns}$)</td>
+                <td>84 MHz ($T_{clk} = 11.905\text{ ns}$)</td>
+                <td>5.25× faster clock; ~6.5× to 20× higher real-world throughput.</td>
+              </tr>
+              <tr>
+                <td><strong>Operating Logic Voltage</strong></td>
+                <td><strong>5.0 V</strong></td>
+                <td><strong>3.3 V (⚠️ NOT 5V Tolerant!)</strong></td>
+                <td>Applying &gt;3.6V to any Due pin destroys the MCU permanently.</td>
+              </tr>
+              <tr>
+                <td><strong>Flash Memory (Program)</strong></td>
+                <td>256 KB (8 KB used by bootloader)</td>
+                <td>512 KB (2 banks × 256 KB)</td>
+                <td>Due executes ROM bootloader; all 512 KB available to user code.</td>
+              </tr>
+              <tr>
+                <td><strong>SRAM Capacity</strong></td>
+                <td>8 KB</td>
+                <td>96 KB (64 KB + 32 KB contiguous)</td>
+                <td>Due offers 12× more RAM for DSP buffers, RTOS tasks, and lookup tables.</td>
+              </tr>
+              <tr>
+                <td><strong>Internal EEPROM</strong></td>
+                <td>4 KB (Byte-addressable)</td>
+                <td>None (0 KB)</td>
+                <td>Due requires external I2C/SPI EEPROM or Flash emulation.</td>
+              </tr>
+              <tr>
+                <td><strong>Digital I/O &amp; PWM Pins</strong></td>
+                <td>54 Digital I/O (15 PWM @ 8-bit)</td>
+                <td>54 Digital I/O (12 PWM @ up to 12/16-bit)</td>
+                <td>Due supports <code>analogWriteResolution(12)</code> (4096 duty steps).</td>
+              </tr>
+              <tr>
+                <td><strong>Analog Inputs &amp; ADC</strong></td>
+                <td>16 Channels, 10-bit SAR (~15 kSPS)</td>
+                <td>12 Channels, 12-bit SAR (up to 1000 kSPS)</td>
+                <td>Due ADC is 4× finer resolution and up to ~66× faster sampling.</td>
+              </tr>
+              <tr>
+                <td><strong>True Analog Output (DAC)</strong></td>
+                <td>0 Channels (PWM Only)</td>
+                <td>2 Channels (DAC0, DAC1 — 12-Bit True Analog)</td>
+                <td>Enables audio synthesis and precision control voltage generation.</td>
+              </tr>
+              <tr>
+                <td><strong>DC Current per I/O Pin</strong></td>
+                <td>20 mA recommended (40 mA Abs Max)</td>
+                <td>3 mA (Low-Drive Pins) / 15 mASource, 9 mASink (High-Drive)</td>
+                <td>Total Due I/O current across all pins must not exceed 130 mA.</td>
+              </tr>
+              <tr>
+                <td><strong>Hardware Communication</strong></td>
+                <td>4× USART, 1× SPI, 1× I2C</td>
+                <td>1× UART + 4× USART, 1× SPI, 2× I2C, 2× CAN, Native USB OTG</td>
+                <td>Due includes native High-Speed USB (480 Mbps) and automotive CAN.</td>
+              </tr>
+              <tr>
+                <td><strong>Direct Memory Access (DMA)</strong></td>
+                <td>None</td>
+                <td>22-Channel PDC + 6-Channel Central AHB DMA</td>
+                <td>Zero-CPU-overhead ADC/DAC/SPI/USART streaming on Due.</td>
+              </tr>
+              <tr>
+                <td><strong>Recommended Input Voltage ($V_{IN}$)</strong></td>
+                <td>7V – 12V (6V–20V absolute limits)</td>
+                <td>7V – 12V (6V–16V absolute limits)</td>
+                <td>Due uses a high-efficiency switching regulator for the 5V rail.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: WORKING PRINCIPLE, PERIPHERALS & SAFETY -->
+  <section id="principles">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Section 03 // Deep-Dive Engineering Analysis</span>
+        <h2 class="section-title">Working Principles, Power Safety, Peripherals &amp; Misconceptions</h2>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>🧠 1. Pipeline &amp; Memory Architecture Walkthrough</h3>
+          <p><strong>Why does an 84 MHz ARM Cortex-M3 outperform a 16 MHz AVR by far more than 5.25×?</strong></p>
+          <ul>
+            <li><strong>Register Width &amp; Multi-Byte Penalty:</strong> Adding two 32-bit integers (<code>uint32_t</code>) on the 8-bit ATmega2560 requires loading 8 bytes across registers and executing <code>ADD</code> followed by three <code>ADC</code> (Add with Carry) instructions—consuming at least 4 ALU cycles plus load/store overhead. On the 32-bit SAM3X8E, a 32-bit addition executes in a <strong>single 11.9 ns clock cycle</strong>.</li>
+            <li><strong>Hardware Multiplication &amp; Division:</strong> ATmega2560 only has an 8×8-bit unsigned/signed hardware multiplier (2 cycles) and <em>zero</em> hardware division (requiring software shift-subtract loops taking 80–240+ cycles). SAM3X8E includes a single-cycle 32×32 hardware multiplier and a 2–12 cycle hardware divider (<code>SDIV</code>/<code>UDIV</code>).</li>
+            <li><strong>Flash Constant Access (<code>PROGMEM</code> vs. Unified Map):</strong> Because AVR separates Flash and SRAM into overlapping address spaces starting at <code>0x0000</code>, normal C pointers always dereference SRAM. Reading constant lookup tables from Flash on Mega requires special <code>LPM</code>/<code>ELPM</code> assembly macros (<code>pgm_read_word_far()</code>). On Due, Flash (<code>0x00080000</code>) and SRAM (<code>0x20000000</code>) live in a unified 4 GB linear space—standard C pointers work seamlessly with <code>const</code> arrays in Flash.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>🛡️ 2. Power Management &amp; 5V-to-3.3V Level Shifting</h3>
+          <p>When interfacing 5V peripherals with the 3.3V Arduino Due, engineers use four primary hardware topologies:</p>
+          <ol>
+            <li><strong>Unidirectional Resistive Voltage Divider (5V Output → 3.3V Due Input):</strong> Use $R_1 = 1.8\text{ k}\Omega$ (series) and $R_2 = 3.3\text{ k}\Omega$ (to GND) so $V_{OUT} = 5.0 \times \frac{3.3}{1.8+3.3} = 3.235\text{V}$. Best for low-to-medium speed signals (&lt;1 MHz).</li>
+            <li><strong>Bi-Directional N-MOSFET Level Shifter (BSS138):</strong> Ideal for open-drain buses like <strong>I2C (SDA/SCL)</strong>. Pull-ups on the LV side connect to 3.3V, and HV side to 5V.</li>
+            <li><strong>CMOS Octal Bus Transceiver (74LVC245 / TXB0108):</strong> Powered from 3.3V with 5V-tolerant inputs; mandatory for high-speed <strong>SPI (MISO/MOSI/SCK)</strong> where resistor divider RC capacitance would distort clock edges.</li>
+            <li><strong>Optocoupler Isolation (PC817 / 6N137):</strong> Provides complete galvanic isolation between noisy 5V/24V industrial sensors and the 3.3V SAM3X8E GPIO bank.</li>
+          </ol>
+          <p style="margin-top:0.5rem;"><strong>High-Current vs. Low-Current Pins on Due:</strong> Not all Due pins are equal! High-drive pins (e.g., D2–D13, D23–D30) source 15 mA / sink 9 mA, whereas low-drive pins (e.g., D0, D1, D14–D22) only source <strong>3 mA</strong> / sink <strong>6 mA</strong>.</p>
+        </div>
+      </div>
+
+      <div class="grid-3" style="margin-top: 1.5rem;">
+        <div class="card">
+          <h3>⏱️ Timers &amp; PWM Subsystem</h3>
+          <ul>
+            <li><strong>Mega 2560:</strong> 6 Hardware Timers—<code>Timer0</code> &amp; <code>Timer2</code> (8-bit) and <code>Timer1</code>, <code>Timer3</code>, <code>Timer4</code>, <code>Timer5</code> (16-bit). <code>Timer0</code> drives <code>millis()</code>/<code>delay()</code>.</li>
+            <li><strong>Due (SAM3X8E):</strong> 3 Timer Counter (TC0, TC1, TC2) modules providing <strong>9 independent 32-bit channels</strong> capable of waveform generation, frequency capture, and hardware quadrature encoder decoding—plus a dedicated 8-channel 16-bit PWM controller.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>📡 Serial, I2C, SPI &amp; CAN</h3>
+          <ul>
+            <li><strong>4 Hardware UARTs:</strong> Both boards expose <code>Serial</code> (0/1), <code>Serial1</code> (18/19), <code>Serial2</code> (16/17), and <code>Serial3</code> (14/15). Never use sluggish <code>SoftwareSerial</code> on either board!</li>
+            <li><strong>I2C Pull-up Quirk on Due:</strong> Pins 20/21 on Due have on-board 1.5 kΩ pull-up resistors, whereas <code>SDA1/SCL1</code> have <em>no</em> internal or on-board pull-ups (external 2.2 kΩ–4.7 kΩ to 3.3V required).</li>
+            <li><strong>Native USB vs. Programming USB:</strong> Due's Programming port routes through an ATmega16U2 (auto-resets SAM3X8E cleanly), while the Native USB port connects directly to the SAM3X8E USB OTG transceiver (capable of USB Host, HID Keyboard/Mouse, and CDC Serial at &gt;1 MB/s).</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>📈 ADC &amp; True DAC Operations</h3>
+          <ul>
+            <li><strong>SAR ADC Comparison:</strong> Mega's 10-bit ADC requires 13 ADC clock cycles per conversion (125 kHz ADC clock $\to 9.6\text{ kHz}$ default, ~15 kSPS max). Due's 12-bit ADC converts in 1 µs (<strong>1 MSPS</strong>) and streams directly to SRAM via PDC DMA.</li>
+            <li><strong>SAM3X8E DAC Voltage Swing Warning:</strong> Due's 12-bit <code>DAC0</code> and <code>DAC1</code> do <strong>not</strong> output 0V to 3.3V! Their internal analog buffer swings from $\frac{1}{6}V_{ADVREF}$ to $\frac{5}{6}V_{ADVREF}$ ($\approx 0.55\text{V}$ to $2.75\text{V}$, a $2.2\text{V}$ span) and requires at least a $1.5\text{ k}\Omega$ load resistor to prevent burning out the DAC output stage.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Common Misconceptions -->
+      <div class="card" style="margin-top: 1.5rem;">
+        <h3>⚠️ Three Critical Student &amp; Developer Misconceptions Debunked</h3>
+        <div class="grid-3" style="margin-top: 0.75rem;">
+          <div class="callout callout-danger" style="margin:0;">
+            <div class="callout-title">❌ Misconception 1: "All Arduino boards are 5V tolerant."</div>
+            <p><strong>Reality:</strong> Standard 5V Arduino shields that wire 5V directly to digital/analog pins or pull I2C lines to 5V will destroy the Arduino Due's 3.3V SAM3X8E MCU. Only shields that respect the R3 <code>IOREF</code> pin (which outputs 3.3V on Due and 5V on Mega) are cross-compatible.</p>
+          </div>
+          <div class="callout callout-info" style="margin:0;">
+            <div class="callout-title">❌ Misconception 2: "Due is only 5.25× faster because 84 / 16 = 5.25."</div>
+            <p><strong>Reality:</strong> Clock ratio ignores <strong>bus width and ISA efficiency</strong>. On 32-bit integer DSP filtering or CRC32 calculation, the 32-bit Cortex-M3 executes in 1 cycle what takes the 8-bit AVR 15 to 40 cycles—yielding a real-world speedup of <strong>15× to 35×</strong>.</p>
+          </div>
+          <div class="callout callout-warning" style="margin:0;">
+            <div class="callout-title">❌ Misconception 3: "Due has built-in EEPROM like Mega."</div>
+            <p><strong>Reality:</strong> The ATSAM3X8E silicon contains <strong>zero EEPROM</strong>. Libraries like <code>DueFlashStorage</code> emulate EEPROM in Flash memory, but every time you upload a new sketch via bossac, the SAM3X8E performs a full Flash erase, wiping all saved data! Use an external I2C FRAM/EEPROM (e.g., 24LC256) for persistent data.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: WAVEFORMS, TIMING DIAGRAMS & SIMULATION -->
+  <section id="waveforms">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Section 04 // Interactive Signal &amp; Timing Visualizers</span>
+        <h2 class="section-title">Waveforms, Quantization Plots &amp; Wokwi/IDE Simulation Output</h2>
+      </div>
+
+      <div class="grid-2">
+        <!-- Interactive Canvas 1: PWM vs True DAC -->
+        <div class="card">
+          <h3>🌊 Visualizer 1: Mega Filtered PWM vs. Due 12-Bit True DAC</h3>
+          <p>Compare an 8-bit PWM wave + RC low-pass filter ripple on Mega against the pure 12-bit staircase sine output of the Due's hardware DAC (0.55V–2.75V range).</p>
+          <div class="calc-group" style="flex-direction: row; align-items: center; flex-wrap: wrap;">
+            <label for="rcSlider">Mega RC Filter Ripple Attenuation:</label>
+            <input type="range" id="rcSlider" min="1" max="10" value="4" oninput="drawWaveforms()" />
+            <span id="rcLabel" style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent-primary);">Moderate RC Filtering</span>
+          </div>
+          <canvas id="dacCanvas" width="560" height="260"></canvas>
+          <p style="font-size: 0.8rem; margin-top: 0.5rem;">
+            <span style="color: #38bdf8;">■ Cyan Dashed:</span> Mega 5V Digital PWM |
+            <span style="color: #22c55e;">■ Green Curve:</span> Mega RC-Filtered Output (with phase lag &amp; ripple) |
+            <span style="color: #ff8b00;">■ Orange Curve:</span> Due True 12-Bit DAC Output (0.55V–2.75V, zero RC lag)
+          </p>
+        </div>
+
+        <!-- Interactive Canvas 2: 10-bit vs 12-bit ADC Step Plot -->
+        <div class="card">
+          <h3>📐 Visualizer 2: ADC Quantization Resolution (10-Bit vs. 12-Bit)</h3>
+          <p>Zoomed-in view of an analog sensor ramp showing quantization staircase error ($\Delta V_{LSB}$): Mega ($4.88\text{ mV/step}$) vs. Due ($0.806\text{ mV/step}$).</p>
+          <div class="calc-group" style="flex-direction: row; align-items: center; flex-wrap: wrap;">
+            <label for="zoomSlider">Signal Zoom Level (mV Span):</label>
+            <input type="range" id="zoomSlider" min="15" max="50" value="25" oninput="drawAdcPlot()" />
+            <span id="zoomLabel" style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent-due);">25 mV Window</span>
+          </div>
+          <canvas id="adcCanvas" width="560" height="260"></canvas>
+          <p style="font-size: 0.8rem; margin-top: 0.5rem;">
+            <span style="color: #94a3b8;">■ White Line:</span> True Analog Sensor Input |
+            <span style="color: #00b8d9;">■ Cyan Steps:</span> Mega 10-Bit @ 5V ($\Delta V = 4.88\text{ mV}$) |
+            <span style="color: #ff8b00;">■ Orange Steps:</span> Due 12-Bit @ 3.3V ($\Delta V = 0.806\text{ mV}$)
+          </p>
+        </div>
+      </div>
+
+      <!-- Communication Timing & Wokwi / Arduino IDE Simulation -->
+      <div class="card" style="margin-top: 1.5rem;">
+        <h3>🔬 Hardware Logic Analyzer Timing &amp; Wokwi / Arduino IDE Benchmark</h3>
+        <p>Below is a side-by-side timing capture of a <strong>32-bit integer FIR filter + SPI frame transmission</strong> executed on both platforms, along with the dual-target firmware code.</p>
+
+        <svg class="svg-diagram" viewBox="0 0 900 210" xmlns="http://www.w3.org/2000/svg">
+          <rect width="900" height="210" rx="8" fill="#060a14"/>
+          <text x="20" y="26" fill="#94a3b8" font-family="monospace" font-size="11">LOGIC ANALYZER CAPTURE: 100-Tap 32-Bit MAC Loop + SPI Transfer Timing</text>
+
+          <!-- Mega Trace -->
+          <text x="20" y="65" fill="#00b8d9" font-family="monospace" font-weight="bold" font-size="12">MEGA (16 MHz)</text>
+          <path d="M 150 70 L 180 70 L 180 45 L 760 45 L 760 70 L 870 70" fill="none" stroke="#00b8d9" stroke-width="2.5"/>
+          <text x="470" y="62" fill="#00b8d9" font-family="monospace" font-size="11" text-anchor="middle">GPIO Pulse High = 312.5 µs (5,000 AVR Clock Cycles)</text>
+
+          <!-- Due Trace -->
+          <text x="20" y="125" fill="#ff8b00" font-family="monospace" font-weight="bold" font-size="12">DUE  (84 MHz)</text>
+          <path d="M 150 130 L 180 130 L 180 105 L 222 105 L 222 130 L 870 130" fill="none" stroke="#ff8b00" stroke-width="2.5"/>
+          <text x="365" y="122" fill="#ff8b00" font-family="monospace" font-size="11">Pulse High = 4.8 µs (403 ARM Clock Cycles — 65× Faster!)</text>
+
+          <!-- SPI SCK comparison -->
+          <text x="20" y="178" fill="#22c55e" font-family="monospace" font-weight="bold" font-size="12">SPI SCK MAX</text>
+          <text x="150" y="178" fill="#cbd5e1" font-family="monospace" font-size="11">Mega Max SPI Clock = f_osc / 2 = 8.0 MHz (125 ns period)  |  Due Max SPI Clock = Master Clock / 2 = 42.0 MHz (23.8 ns period)</text>
+        </svg>
+
+        <pre><code>// Wokwi / Arduino IDE Cross-Platform Benchmark &amp; 12-Bit Analog Demo
+// Compiles cleanly on both Arduino Mega 2560 (__AVR_ATmega2560__) and Arduino Due (__SAM3X8E__)
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(2, OUTPUT);
+
+  #if defined(__SAM3X8E__)
+    analogReadResolution(12);   // Enable full 12-bit ADC (0–4095) on Arduino Due
+    analogWriteResolution(12);  // Enable full 12-bit DAC/PWM (0–4095) on Arduino Due
+    Serial.println("Target MCU: ATSAM3X8E (32-Bit ARM Cortex-M3 @ 84 MHz, 3.3V Logic)");
+  #elif defined(__AVR_ATmega2560__)
+    Serial.println("Target MCU: ATmega2560 (8-Bit AVR RISC @ 16 MHz, 5.0V Logic)");
+  #endif
+}
+
+void loop() {
+  volatile uint32_t acc = 0;
+  uint32_t t0 = micros();
+
+  digitalWrite(2, HIGH);
+  for (uint32_t i = 1; i &lt;= 100; i++) {
+    acc += (i * 123456UL) / 7UL; // 32-bit multiply + divide benchmark
+  }
+  digitalWrite(2, LOW);
+
+  uint32_t dt = micros() - t0;
+  uint16_t rawAdc = analogRead(A0);
+
+  #if defined(__SAM3X8E__)
+    analogWrite(DAC0, rawAdc); // Output true analog voltage on Due DAC0 pin (0.55V - 2.75V)
+  #else
+    analogWrite(3, rawAdc &gt;&gt; 2); // Downshift 10-bit ADC to 8-bit PWM on Mega Pin 3
+  #endif
+
+  Serial.print("Execution Time (us): "); Serial.print(dt);
+  Serial.print(" | Raw ADC: "); Serial.println(rawAdc);
+  delay(1000);
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: MATHEMATICAL EQUATIONS & INTERACTIVE CALCULATORS -->
+  <section id="math">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Section 05 // Quantitative Engineering Models</span>
+        <h2 class="section-title">Governing Equations &amp; Interactive Design Calculators</h2>
+      </div>
+
+      <div class="grid-2">
+        <!-- Core Formulas Card -->
+        <div class="card">
+          <h3>📐 Essential Microcontroller Equations</h3>
+
+          <p><strong>1. ADC Quantization Step Size ($\Delta V_{LSB}$) &amp; Reconstructed Voltage ($V_{IN}$):</strong></p>
+          <div class="formula-box">
+            ΔV_LSB = V_REF / (2^N - 1)   |   V_IN = [ ADC_Code / (2^N - 1) ] × V_REF
+          </div>
+          <p style="font-size:0.84rem; margin-bottom: 0.75rem;">
+            • <strong>Mega (10-bit, $N=10, V_{REF}=5.0\text{V}$):</strong> $\Delta V_{LSB} = \frac{5.0}{1023} \approx 4.8876\text{ mV}$ (or $\frac{5.0}{1024} = 4.8828\text{ mV}$)<br>
+            • <strong>Due (12-bit, $N=12, V_{REF}=3.3\text{V}$):</strong> $\Delta V_{LSB} = \frac{3.3}{4095} \approx 0.80586\text{ mV}$ (<strong>6.06× finer voltage resolution!</strong>)
+          </p>
+
+          <p><strong>2. Timer PWM Frequency ($f_{PWM}$) &amp; Duty Cycle:</strong></p>
+          <div class="formula-box">
+            Mega Fast PWM: f_PWM = f_clk / [ N_prescaler × (1 + TOP) ]<br>
+            Due PWM Ch:    f_PWM = (MCLK / Prescaler) / CPRD
+          </div>
+
+          <p><strong>3. USART Baud Rate Register ($UBRR$ on AVR vs. $CD$ on SAM3X8E):</strong></p>
+          <div class="formula-box">
+            Mega Normal (U2X=0): UBRR = round( f_osc / (16 × Baud) ) - 1<br>
+            Mega Double (U2X=1): UBRR = round( f_osc / (8 × Baud) ) - 1<br>
+            Due Clock Divider:   CD   = round( MCLK / (16 × Baud) )
+          </div>
+
+          <p><strong>4. Due True DAC Output Voltage Equation ($V_{DAC}$):</strong></p>
+          <div class="formula-box">
+            V_DAC(D) = V_ADVREF × [ (1/6) + (4/6) × (D / 4095) ]  ≈ 0.55V to 2.75V
+          </div>
+
+          <p><strong>5. Passive Resistor Voltage Divider (5V → 3.3V Level Shifter):</strong></p>
+          <div class="formula-box">
+            V_OUT = V_IN × [ R2 / (R1 + R2) ]   |   I_sink = V_IN / (R1 + R2)
+          </div>
+        </div>
+
+        <!-- Interactive Engineering Calculator Suite -->
+        <div class="card">
+          <h3>🧮 Interactive Embedded Design Calculators</h3>
+
+          <!-- Calculator 1: ADC & DAC Converter -->
+          <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem;">
+            <h4 style="color: var(--accent-primary);">A. Live ADC &amp; Due DAC Voltage Calculator</h4>
+            <div class="calc-group">
+              <label>Input Sensor Voltage $V_{IN}$ (V): <span id="vInVal">1.65 V</span></label>
+              <input type="range" id="adcVin" min="0" max="5" step="0.01" value="1.65" oninput="runAdcCalc()" />
+            </div>
+            <div class="calc-result" id="adcCalcOut"></div>
+          </div>
+
+          <!-- Calculator 2: Baud Rate & Error Calculator -->
+          <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem;">
+            <h4 style="color: var(--accent-due);">B. UART Baud Rate &amp; Clock Drift Error Calculator</h4>
+            <div class="calc-group">
+              <label for="baudSelect">Target Baud Rate (bps):</label>
+              <select id="baudSelect" onchange="runBaudCalc()">
+                <option value="9600">9600 bps</option>
+                <option value="38400">38400 bps</option>
+                <option value="57600">57600 bps</option>
+                <option value="115200" selected>115200 bps</option>
+                <option value="250000">250000 bps (3D Printer Marlin Standard)</option>
+                <option value="500000">500000 bps</option>
+              </select>
+            </div>
+            <div class="calc-result" id="baudCalcOut"></div>
+          </div>
+
+          <!-- Calculator 3: 5V to 3.3V Level Shifter Designer -->
+          <div>
+            <h4 style="color: var(--accent-success);">C. 5V-to-3.3V Resistor Divider Safety Verifier</h4>
+            <div class="grid-2" style="gap: 0.6rem;">
+              <div class="calc-group">
+                <label for="r1Input">$R_1$ Series Resistor ($\Omega$):</label>
+                <input type="number" id="r1Input" value="3300" min="100" step="100" oninput="runDividerCalc()" />
+              </div>
+              <div class="calc-group">
+                <label for="r2Input">$R_2$ Ground Resistor ($\Omega$):</label>
+                <input type="number" id="r2Input" value="5600" min="100" step="100" oninput="runDividerCalc()" />
+              </div>
+            </div>
+            <div class="calc-result" id="dividerCalcOut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: SOLVED NUMERICAL EXAMPLES -->
+  <section id="examples">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Section 06 // Step-by-Step Numerical Problems</span>
+        <h2 class="section-title">Solved Practical &amp; GATE-Level Engineering Examples</h2>
+      </div>
+
+      <div class="grid-3">
+        <!-- Example 1 -->
+        <div class="card">
+          <span class="pill pill-mega">Example 01 // Easy (ADC Precision)</span>
+          <h3 style="margin-top:0.65rem;">Minimum Detectable Voltage &amp; Temperature Resolution</h3>
+          <p><strong>Problem:</strong> An analog temperature sensor outputs $10\text{ mV/}^\circ\text{C}$ (e.g., LM35). Calculate the minimum detectable voltage change ($\Delta V_{\min}$) and smallest measurable temperature step ($\Delta T_{\min}$) on (a) Arduino Mega 2560 (10-bit, $V_{REF}=5.0\text{V}$) and (b) Arduino Due (12-bit, $V_{REF}=3.3\text{V}$).</p>
+          <pre><code>1. Arduino Mega 2560 (10-bit, 1024 levels):
+   ΔV_min(Mega) = 5.0 V / (2^10 - 1)
+                = 5.0 V / 1023 = 4.8876 mV
+   ΔT_min(Mega) = 4.8876 mV / (10 mV/°C)
+                = 0.489 °C per ADC count
+
+2. Arduino Due (12-bit, 4096 levels):
+   ΔV_min(Due)  = 3.3 V / (2^12 - 1)
+                = 3.3 V / 4095 = 0.8059 mV
+   ΔT_min(Due)  = 0.8059 mV / (10 mV/°C)
+                = 0.0806 °C per ADC count</code></pre>
+          <p><strong>Engineering Interpretation:</strong> Despite a lower $3.3\text{V}$ ceiling, the Due achieves <strong>$6.06\times$ finer voltage sensitivity</strong>, resolving $0.08^\circ\text{C}$ fluctuations without external op-amp gain.</p>
+        </div>
+
+        <!-- Example 2 -->
+        <div class="card">
+          <span class="pill pill-due">Example 02 // Moderate (Level Shifter Design)</span>
+          <h3 style="margin-top:0.65rem;">5V Sensor Interface with Current Constraint</h3>
+          <p><strong>Problem:</strong> Design a passive resistive voltage divider to interface a $5.0\text{V}$ digital encoder output with an Arduino Due GPIO pin such that $V_{OUT} = 3.15\text{V}$ and the current drawn from the sensor stays strictly below $I_{\max} = 1.0\text{ mA}$.</p>
+          <pre><code>1. Voltage Ratio Equation:
+   V_OUT / V_IN = R2 / (R1 + R2)
+   3.15 / 5.00  = 0.630  =&gt;  R2 = 0.63 (R1 + R2)
+   R1 / R2      = (5.00 - 3.15) / 3.15 = 0.5873
+
+2. Minimum Total Resistance for I &lt; 1.0 mA:
+   R_total = R1 + R2 &gt; 5.0 V / 1.0 mA = 5.0 kΩ
+
+3. Select Standard E24 1% Resistors:
+   Let R2 = 5.6 kΩ, R1 = 3.3 kΩ:
+   R_total = 3.3 kΩ + 5.6 kΩ = 8.9 kΩ (&gt; 5.0 kΩ ✔)
+   V_OUT   = 5.0 V × (5.6 / 8.9) = 3.146 V (≈ 3.15 V ✔)
+   I_sink  = 5.0 V / 8.9 kΩ = 0.562 mA (&lt; 1.0 mA ✔)</code></pre>
+          <p><strong>Verification:</strong> Since SAM3X8E $V_{IH(\min)} = 0.7 \times 3.3\text{V} = 2.31\text{V}$ and $V_{\max} = 3.6\text{V}$, $3.146\text{V}$ provides a generous $+836\text{ mV}$ noise margin while staying $454\text{ mV}$ below the damage threshold.</p>
+        </div>
+
+        <!-- Example 3 -->
+        <div class="card">
+          <span class="pill">Example 03 // GATE / Advanced (USART Baud Error)</span>
+          <h3 style="margin-top:0.65rem;">115,200 bps Baud Error: Mega (16 MHz) vs. Due (84 MHz)</h3>
+          <p><strong>Problem:</strong> Calculate the integer baud rate divisor, actual baud rate, and percentage framing error for $115,200\text{ bps}$ UART communication on Mega ($16\text{ MHz}$) in Normal Mode ($U2X=0$) vs. Double Speed ($U2X=1$), and compare with Due ($84\text{ MHz}$).</p>
+          <pre><code>1. Mega Normal Mode (16x Oversampling, U2X0 = 0):
+   UBRR_exact = [16,000,000 / (16 × 115200)] - 1 = 7.6806
+   Nearest Integer UBRR = 8
+   Baud_actual = 16,000,000 / [16 × (8 + 1)] = 111,111 bps
+   Error % = [(111,111 - 115,200) / 115,200] × 100 = -3.55% ❌
+   (Exceeds ±2.0% UART receiver tolerance!)
+
+2. Mega Double Speed Mode (8x Oversampling, U2X0 = 1):
+   UBRR_exact = [16,000,000 / (8 × 115200)] - 1 = 16.361
+   Nearest Integer UBRR = 16
+   Baud_actual = 16,000,000 / [8 × (16 + 1)] = 117,647 bps
+   Error % = +2.12% (Marginal; why 250,000 bps = 0.0% error is preferred!)
+
+3. Arduino Due (84 MHz Master Clock, 16x Oversampling):
+   CD_exact = 84,000,000 / (16 × 115200) = 45.5729
+   Integer CD = 46 =&gt; Baud = 114,130 bps (Error = -0.93% ✔)
+   With USART Fractional Part (FP=5/8): Error = -0.05% ✔</code></pre>
+          <p><strong>Conclusion:</strong> Due's $84\text{ MHz}$ clock and fractional baud generator achieve $-0.05\%$ error at $115.2\text{ kbps}$, whereas Mega must enable $U2X=1$ or switch to $250\text{ kbps}$ ($UBRR=3$, $0\%$ error).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7 & 11: INTERACTIVE 10-QUESTION GATE & COMPETITIVE EXAM QUIZ -->
+  <section id="quiz">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Section 07 // GATE &amp; Embedded Hardware Assessment</span>
+        <h2 class="section-title">Interactive 10-Question Technical Mastery Quiz</h2>
+        <p style="color: var(--text-secondary);">Test your understanding of AVR vs. ARM architecture, interrupt atomicity, electrical safety, and peripheral calculations. Select an answer and click <strong>Check Answer</strong> on any item, or grade the entire exam at the bottom.</p>
+      </div>
+
+      <div id="quizContainer"></div>
+
+      <div class="card" style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:1rem;">
+        <div>
+          <h3 id="quizScoreText" style="margin-bottom:0.2rem;">Current Score: Not Graded Yet</h3>
+          <p id="quizSummaryText">Answer all 10 questions and click "Grade Full Quiz" to see your performance breakdown.</p>
+        </div>
+        <div class="action-btns">
+          <button class="btn btn-primary" onclick="gradeAllQuiz()">✅ Grade Full Quiz</button>
+          <button class="btn" onclick="resetQuiz()">🔄 Reset Quiz</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 8: CORE COMPANY INTERVIEW PREPARATION -->
+  <section id="interview">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Section 08 // Core Hardware &amp; Firmware Interviews</span>
+        <h2 class="section-title">10 High-Impact Technical Interview Questions &amp; Industry Case Study</h2>
+        <p style="color: var(--text-secondary);">Curated for Embedded Firmware, Silicon Validation, and Automotive/IoT Hardware interviews (Texas Instruments, Microchip, NXP, STMicroelectronics, Bosch, Qualcomm). Click any question to expand the model engineering answer.</p>
+      </div>
+
+      <div id="accordionContainer">
+        <!-- Q1 -->
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">
+            <span>Q1. Why can't you directly connect a 5V sensor output to an Arduino Due GPIO pin, and what are 3 hardware topologies to interface them safely?</span>
+            <span>➕</span>
+          </button>
+          <div class="accordion-body">
+            <p><strong>Root Cause (Silicon Physics):</strong> Each GPIO pin on the ATSAM3X8E has internal ESD protection diodes connected to $V_{DDIO}$ ($3.3\text{V}$) and GND. The absolute maximum rating on any I/O pin is $V_{DDIO} + 0.3\text{V} = 3.6\text{V}$. Applying $5.0\text{V}$ forward-biases the upper clamping diode, dumping uncontrolled current into the $3.3\text{V}$ rail and causing latch-up or oxide breakdown.</p>
+            <p style="margin-top:0.5rem;"><strong>Three Safe Hardware Interfacing Solutions:</strong></p>
+            <ol>
+              <li><strong>Resistive Voltage Divider ($R_1 = 1.8\text{ k}\Omega, R_2 = 3.3\text{ k}\Omega$):</strong> Drops $5\text{V} \to 3.23\text{V}$ for unidirectional low/medium-speed digital or analog signals.</li>
+              <li><strong>Bi-directional N-Channel MOSFET Level Shifter (BSS138):</strong> Essential for bi-directional open-drain buses like I2C where both master and slave pull the line low.</li>
+              <li><strong>5V-Tolerant CMOS Buffer IC (74LVC245 / 74AHCT125):</strong> Powered from $3.3\text{V}$ with overvoltage-tolerant inputs; provides fast push-pull edges (&lt;5 ns) required for multi-megahertz SPI buses.</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">
+            <span>Q2. Compare Harvard vs. Von Neumann architecture in the context of ATmega2560 and ATSAM3X8E. How does this impact reading constant arrays from Flash?</span>
+            <span>➕</span>
+          </button>
+          <div class="accordion-body">
+            <p><strong>ATmega2560 (Strict Modified Harvard):</strong> Uses completely disjoint address spaces starting at <code>0x0000</code> for Flash and <code>0x0000</code> for Data (Registers + I/O + SRAM). Standard C pointers only address the Data bus (SRAM). Therefore, if you declare <code>const uint8_t lut[1000] = {...};</code> without special attributes, the compiler copies the entire array from Flash into your scarce 8 KB SRAM at boot! To keep it in Flash, you must use <code>PROGMEM</code> and special <code>LPM</code>/<code>ELPM</code> instructions (<code>pgm_read_byte_near()</code>).</p>
+            <p style="margin-top:0.5rem;"><strong>ATSAM3X8E (ARM Cortex-M3 Harvard Bus Matrix with Unified Address Map):</strong> Has separate physical I-Code/D-Code buses to Flash and a System bus to SRAM (so instruction fetches and data accesses occur simultaneously), <em>but</em> maps Flash (<code>0x00080000</code>), SRAM (<code>0x20000000</code>), and Peripherals (<code>0x40000000</code>) into a single 4 GB linear address space. Declaring <code>const uint32_t lut[1000]</code> leaves the data in Flash automatically, and standard C pointers read it directly with zero SRAM consumption.</p>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">
+            <span>Q3. What is Direct Memory Access (DMA)? Why does Arduino Due support DMA while Mega does not, and how does it transform high-speed ADC sampling?</span>
+            <span>➕</span>
+          </button>
+          <div class="accordion-body">
+            <p><strong>DMA Principle:</strong> A DMA controller is a dedicated hardware bus master that transfers data blocks directly between peripherals (ADC, DAC, SPI, USART) and SRAM without CPU intervention, firing a single interrupt only when an entire buffer (e.g., 1024 samples) is full.</p>
+            <p style="margin-top:0.5rem;"><strong>Mega vs. Due Impact:</strong> On the Mega 2560 (no DMA), sampling an ADC at high rates requires firing an ISR on every single sample (consuming ~50+ cycles of context-save/restore overhead per sample). On the Due, the <strong>Peripheral DMA Controller (PDC)</strong> automatically moves 12-bit ADC conversions from <code>ADC-&gt;ADC_CDR[x]</code> into a ping-pong SRAM buffer at <strong>1 MSPS (1,000,000 samples/sec)</strong> with <strong>0% CPU load</strong>, leaving the ARM core completely free to execute an FFT on the previous buffer.</p>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">
+            <span>Q4. How do you handle atomic operations and race conditions when accessing a 32-bit volatile variable shared with an ISR on an 8-bit MCU vs. a 32-bit MCU?</span>
+            <span>➕</span>
+          </button>
+          <div class="accordion-body">
+            <p><strong>The 8-Bit Tearing Hazard (Mega 2560):</strong> Reading or writing a <code>volatile uint32_t counter</code> in <code>loop()</code> on an 8-bit AVR compiles into <strong>four separate 8-bit <code>LDS</code>/<code>STS</code> instructions</strong>. If an interrupt fires after byte 2 is read and modifies <code>counter</code>, the main loop reads a corrupted half-old, half-new 32-bit value! On Mega, you <em>must</em> wrap multi-byte shared reads in an atomic critical section:</p>
+            <pre><code>// Required on 8-bit AVR (ATmega2560) for 16-bit or 32-bit shared variables:
+#include &lt;util/atomic.h&gt;
+uint32_t safeCopy;
+ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+  safeCopy = sharedIsrCounter32;
+}</code></pre>
+            <p><strong>32-Bit ARM Behavior (Arduino Due):</strong> On the 32-bit Cortex-M3, aligned 32-bit load (<code>LDR</code>) and store (<code>STR</code>) instructions execute atomically in a single bus transaction. However, read-modify-write sequences (<code>sharedCounter++</code>) still take 3 instructions (<code>LDR</code> → <code>ADD</code> → <code>STR</code>) and require <code>__LDREXW</code>/<code>__STREXW</code> exclusive access primitives or <code>__disable_irq()</code> if both main code and ISR modify the variable.</p>
+          </div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">
+            <span>Q5. Explain True DAC vs. PWM-filtered analog output. When is a True DAC mandatory in embedded system design?</span>
+            <span>➕</span>
+          </button>
+          <div class="accordion-body">
+            <p><strong>PWM + RC Filter (Mega):</strong> Switches a digital pin between 0V and 5V at 490/980 Hz. An external RC low-pass filter averages the duty cycle into a DC voltage, but introduces a severe trade-off: lowering the cutoff frequency $f_c = \frac{1}{2\pi RC}$ to suppress voltage ripple dramatically increases settling time ($\tau = RC$), limiting bandwidth to a few dozen Hertz.</p>
+            <p style="margin-top:0.5rem;"><strong>True 12-Bit DAC (Due):</strong> Uses an internal weighted resistor/current-steering ladder to output an instantaneous continuous analog voltage with a settling time under $2\text{ }\mu\text{s}$. A true DAC is mandatory for <strong>audio waveform synthesis (20 Hz–20 kHz), arbitrary function generation, high-speed galvo laser scanners, and fast analog control loops</strong>.</p>
+          </div>
+        </div>
+
+        <!-- Q6 -->
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">
+            <span>Q6. Compare the Arduino Due's "Programming USB Port" and "Native USB Port." How do they differ during firmware upload and hung-CPU debugging?</span>
+            <span>➕</span>
+          </button>
+          <div class="accordion-body">
+            <p><strong>Programming USB Port (`Serial`):</strong> Connects to an on-board <strong>ATmega16U2</strong> bridge chip wired to the SAM3X8E's hardware <code>UART</code> (RX0/TX0) plus its hardware <code>ERASE</code> and <code>NRST</code> pins. When the IDE opens this port at 1200 bps, the 16U2 physically asserts the SAM3X8E's <code>ERASE</code> and <code>RESET</code> pins in hardware—guaranteeing reliable uploads even if your user firmware has crashed inside an infinite ISR or disabled interrupts!</p>
+            <p style="margin-top:0.5rem;"><strong>Native USB Port (`SerialUSB`):</strong> Connects directly to the SAM3X8E's internal USB 2.0 High-Speed OTG peripheral. It achieves much higher throughput (&gt;1 MB/s vs. 115.2 kbps) and supports USB Host/HID emulation, <em>but</em> relies on software USB interrupts to detect the 1200 bps auto-erase trigger. If your sketch crashes or disables interrupts, the Native USB port stops responding, requiring you to manually press the physical <strong>ERASE button</strong> for 1 second followed by the <strong>RESET button</strong>.</p>
+          </div>
+        </div>
+
+        <!-- Q7 -->
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">
+            <span>Q7. What is CAN Bus, and why is the Arduino Due preferred over the Mega 2560 for automotive telematics and industrial robotics?</span>
+            <span>➕</span>
+          </button>
+          <div class="accordion-body">
+            <p><strong>CAN (Controller Area Network - ISO 11898):</strong> A multi-master, differential-signaling (<code>CAN_H</code> / <code>CAN_L</code>) serial bus featuring non-destructive bitwise arbitration, hardware CRC-15 error detection, automatic retransmission, and fault confinement up to 1 Mbps.</p>
+            <p style="margin-top:0.5rem;"><strong>Why Due Wins:</strong> The ATSAM3X8E integrates <strong>two independent hardware CAN 2.0A/B controllers (CAN0 and CAN1)</strong> with 8 hardware message mailboxes each directly on the AHB bus—requiring only a tiny external 3.3V transceiver IC (e.g., SN65HVD230 or TJA1051V) on pins <code>CANRX</code>/<code>CANTX</code>. The Mega 2560 has no CAN hardware and must communicate over SPI to an external MCP2515 controller (which only has 2 receive buffers, frequently dropping frames on busy 500 kbps vehicle buses).</p>
+          </div>
+        </div>
+
+        <!-- Q8 -->
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">
+            <span>Q8. What happens to SRAM memory layout if you allocate large buffers on Mega (8 KB SRAM) vs. Due (96 KB SRAM)? Explain the Due's dual-bank SRAM architecture.</span>
+            <span>➕</span>
+          </button>
+          <div class="accordion-body">
+            <p><strong>Mega 2560 (8 KB SRAM):</strong> Allocating a single 128×64 monochrome OLED frame buffer (1 KB) plus a 512-byte SD card sector buffer and string literals quickly causes the downward-growing <strong>Stack</strong> to collide with the upward-growing <strong>Heap / `.bss`</strong> segment, causing silent memory corruption and random resets.</p>
+            <p style="margin-top:0.5rem;"><strong>Due (96 KB Contiguous Dual-Bank SRAM):</strong> The SAM3X8E contains <code>SRAM0</code> (64 KB at <code>0x20000000</code>, mirrored at <code>0x20070000</code>) and <code>SRAM1</code> (32 KB at <code>0x20080000</code>). Because the mirror of <code>SRAM0</code> ends at <code>0x2007FFFF</code> and <code>SRAM1</code> starts immediately at <code>0x20080000</code>, the linker sees a single contiguous <strong>96 KB RAM block</strong>, while the AHB bus matrix allows the CPU to access <code>SRAM0</code> simultaneously while the DMA controller writes ADC data into <code>SRAM1</code> with zero bus contention!</p>
+          </div>
+        </div>
+
+        <!-- Q9 -->
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">
+            <span>Q9. Explain the physical limit on GPIO source/sink current on SAM3X8E (3 mA / 15 mA) vs. ATmega2560 (40 mA). How does this alter LED and relay driver circuit design?</span>
+            <span>➕</span>
+          </button>
+          <div class="accordion-body">
+            <p><strong>Current Drive Contrast:</strong> ATmega2560 output transistors are large 5V structures capable of sourcing/sinking 20 mA continuously (40 mA absolute maximum; 200 mA total across VCC/GND pins). The SAM3X8E uses dense 3.3V sub-micron transistors: <strong>Low-Drive pins can only source 3 mA (sink 6 mA)</strong>, and <strong>High-Drive pins source 15 mA (sink 9 mA)</strong>, with a strict total package ceiling of 130 mA.</p>
+            <p style="margin-top:0.5rem;"><strong>Circuit Design Impact:</strong> On a Mega, engineers often drive a 15 mA LED or optocoupler directly from any GPIO pin with a $220\text{ }\Omega$ resistor. Doing that on a Due low-drive pin (like D0, D1, D14–D22) exceeds its 3 mA rating by 500% and damages the output driver! On the Due, always use an <strong>N-channel MOSFET (e.g., 2N7002 / AO3400)</strong>—which requires virtually zero DC gate current—or an NPN transistor with a $2.2\text{ k}\Omega$–$4.7\text{ k}\Omega$ base resistor to switch loads.</p>
+          </div>
+        </div>
+
+        <!-- Q10 -->
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">
+            <span>Q10. How do Pin Change Interrupts (PCINT) differ from External Hardware Interrupts (INTx) on the Mega 2560, and how does the Due's NVIC + PIO controller improve on both?</span>
+            <span>➕</span>
+          </button>
+          <div class="accordion-body">
+            <p><strong>Mega 2560 (`INT0–INT5` vs. `PCINT0–PCINT23`):</strong></p>
+            <ul>
+              <li><strong>External Interrupts (`INT0–INT5` on Pins 2, 3, 18, 19, 20, 21):</strong> Each pin has its own dedicated interrupt vector and hardware edge detector configurable for <code>LOW</code>, <code>CHANGE</code>, <code>RISING</code>, or <code>FALLING</code> edges.</li>
+              <li><strong>Pin Change Interrupts (`PCINT0–23`):</strong> Grouped into three 8-pin ports (`PCINT0_vect`, `PCINT1_vect`, `PCINT2_vect`). They only trigger on <em>any toggle</em> (cannot distinguish rising vs. falling in hardware) and share a single ISR per 8 pins—requiring software XOR bitmasking in the ISR to figure out which pin changed and whether it went high or low.</li>
+            </ul>
+            <p style="margin-top:0.5rem;"><strong>Due (`PIOA–PIOD` + ARM NVIC):</strong> Every single one of the 54 digital pins on the Due has independent hardware edge/level detection (Rising, Falling, Change, Low, High) and hardware glitch/debounce filtering, managed by the Cortex-M3 <strong>Nested Vectored Interrupt Controller (NVIC)</strong> with programmable priority levels and 12-cycle tail-chained latency.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Industry Case Study -->
+      <div class="card" style="margin-top: 1.5rem; border-left: 4px solid var(--accent-due);">
+        <h3>🏭 Industry Engineering Case Study: Selecting 8-Bit AVR vs. 32-Bit ARM in Production</h3>
+        <p><strong>Scenario:</strong> An industrial automation firm is designing two products: (A) a <strong>harsh-environment 24V/5V conveyor belt safety interlock controller</strong> and (B) a <strong>4-channel vibration &amp; acoustic predictive maintenance gateway</strong> sampling accelerometers at 50 kHz per channel.</p>
+        <div class="grid-2" style="margin-top: 0.85rem;">
+          <div style="background: var(--bg-elevated); padding: 1rem; border-radius: 8px;">
+            <h4 style="color: var(--accent-mega);">Why Product A Selects 8-Bit 5V AVR (ATmega2560)</h4>
+            <ul>
+              <li><strong>High Noise Immunity:</strong> 5V logic thresholds provide a $1.5\text{V}$–$2.0\text{V}$ noise margin against electromagnetic interference (EMI) from heavy contactors and VFDs.</li>
+              <li><strong>Built-in Byte EEPROM:</strong> Directly logs fault counters and interlock calibration states without risking full-page Flash wear or needing external EEPROM ICs.</li>
+              <li><strong>Lower BOM Cost for 5V Peripherals:</strong> Directly interfaces with legacy 5V industrial sensors, character LCDs, and relay optocouplers without level-shifter ICs.</li>
+            </ul>
+          </div>
+          <div style="background: var(--bg-elevated); padding: 1rem; border-radius: 8px;">
+            <h4 style="color: var(--accent-due);">Why Product B Selects 32-Bit ARM Cortex-M3 (ATSAM3X8E)</h4>
+            <ul>
+              <li><strong>DMA + 1 MSPS 12-Bit ADC:</strong> Captures $4 \times 50\text{ kSPS} = 200\text{ kSPS}$ continuously into 96 KB SRAM via PDC DMA with near-zero CPU interrupt jitter.</li>
+              <li><strong>32-Bit DSP Headroom:</strong> Computes 1024-point fixed-point FFTs in milliseconds using single-cycle 32×32 hardware multiply-accumulate (`MLA`) instructions.</li>
+              <li><strong>Native CAN Bus Integration:</strong> Broadcasts real-time bearing fault spectra directly onto the factory CANopen network via built-in CAN0/CAN1 hardware controllers.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 9 & 10: APPLICATIONS, CAREER & QUICK REVISION CHEAT SHEET -->
+  <section id="applications">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Section 09 // Real-World Systems &amp; Revision Matrix</span>
+        <h2 class="section-title">Applications, PCB Design Rules, Career Roadmap &amp; Cheat Sheet</h2>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <h3>🤖 Flagship Applications</h3>
+          <p><strong style="color: var(--accent-mega);">Arduino Mega 2560 Dominates:</strong></p>
+          <ul>
+            <li><strong>3D Printers &amp; CNCs:</strong> Industry-standard <strong>RAMPS 1.4</strong> shield driving 5× stepper motors, heated bed MOSFETs, thermistors, SD card, and LCD via Marlin firmware.</li>
+            <li><strong>Multi-Servo Hexapod Robots:</strong> Controlling up to 48 servos simultaneously using four 16-bit hardware timers.</li>
+            <li><strong>5V Industrial Test Fixtures:</strong> High-pin-count cable harness Continuity testers and multi-relay automation rigs.</li>
+          </ul>
+          <p style="margin-top:0.65rem;"><strong style="color: var(--accent-due);">Arduino Due Dominates:</strong></p>
+          <ul>
+            <li><strong>Digital Audio Synthesizers &amp; Guitar Pedals:</strong> 44.1 kHz 12-bit ADC-to-DSP-to-DAC real-time audio effects.</li>
+            <li><strong>OBD-II &amp; Dual-CAN Automotive Gateways:</strong> Bridging high-speed powertrain CAN (500 kbps) and body CAN (125 kbps).</li>
+            <li><strong>32-Bit CNC/3D Printer Upgrades (RAMPS-FD / SmartRAMPS):</strong> High-step-rate delta printers requiring fast inverse kinematics.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>🖥️ PCB Layout &amp; Career Transition</h3>
+          <p><strong>84 MHz ARM vs. 16 MHz AVR PCB Rules:</strong></p>
+          <ul>
+            <li><strong>Decoupling Capacitors:</strong> ATSAM3X8E requires $100\text{ nF}$ MLCCs placed within $2\text{ mm}$ of every `VDDIO`, `VDDCORE` ($1.8\text{V}$ internal core regulator output), and `VDDANA` pin, plus a ferrite bead isolating `VDDANA` for clean 12-bit ADC performance.</li>
+            <li><strong>USB Differential Routing:</strong> Native USB High-Speed ($480\text{ Mbps}$) on Due requires length-matched $90\text{ }\Omega$ differential impedance traces (`D+`/`D-`).</li>
+          </ul>
+          <p style="margin-top:0.65rem;"><strong>Career Progression Roadmap:</strong></p>
+          <ol>
+            <li><strong>Level 1:</strong> Arduino HAL (`digitalWrite`, `analogRead`).</li>
+            <li><strong>Level 2:</strong> Bare-metal Register Programming (`PORTB |= (1&lt;&lt;7)` on AVR; `PIOB-&gt;PIO_SODR = PIO_PB27` on SAM3X).</li>
+            <li><strong>Level 3:</strong> ARM <strong>CMSIS</strong> standard, hardware timers, PDC DMA descriptors, and <strong>FreeRTOS</strong> multi-tasking on Cortex-M3.</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h3>⚡ High-Priority Golden Safety Rules</h3>
+          <ul style="list-style: none; padding-left: 0;">
+            <li style="margin-bottom:0.65rem;">🛑 <strong>Rule 1:</strong> Never apply &gt;3.3V ($3.6\text{V}$ abs max) to ANY Arduino Due pin. Always verify shield `IOREF` compatibility first.</li>
+            <li style="margin-bottom:0.65rem;">🛑 <strong>Rule 2:</strong> Never draw &gt;3 mA from Due low-drive pins or &gt;15 mA from Due high-drive pins. Always buffer relays/LEDs with a MOSFET.</li>
+            <li style="margin-bottom:0.65rem;">🛑 <strong>Rule 3:</strong> Always connect at least a $1.5\text{ k}\Omega$ load resistor in series with Due `DAC0`/`DAC1` pins, and remember their output spans $0.55\text{V}$–$2.75\text{V}$.</li>
+            <li style="margin-bottom:0.65rem;">🛑 <strong>Rule 4:</strong> Wrap 16-bit and 32-bit ISR-shared variables in `ATOMIC_BLOCK` on the 8-bit Mega 2560 to prevent multi-byte read tearing.</li>
+            <li>🛑 <strong>Rule 5:</strong> Add external $2.2\text{ k}\Omega$–$4.7\text{ k}\Omega$ pull-ups to $3.3\text{V}$ when using Due's secondary I2C bus (`SDA1`/`SCL1`).</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Quick Revision Memory Map & Register Cheatsheet -->
+      <div class="card" style="margin-top: 1.5rem;">
+        <h3>📋 Quick-Revision Cheat Sheet: Register &amp; Memory Map Summary</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Operation / Feature</th>
+                <th>Arduino Mega 2560 (ATmega2560)</th>
+                <th>Arduino Due (ATSAM3X8E)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Configure Pin D13 as Output</strong></td>
+                <td><code>DDRB |= (1 &lt;&lt; PB7);</code></td>
+                <td><code>PIOB-&gt;PIO_PER = PIO_PB27; PIOB-&gt;PIO_OER = PIO_PB27;</code></td>
+              </tr>
+              <tr>
+                <td><strong>Set Pin D13 HIGH (1-Cycle Fast I/O)</strong></td>
+                <td><code>PORTB |= (1 &lt;&lt; PB7);</code></td>
+                <td><code>PIOB-&gt;PIO_SODR = PIO_PB27;</code> (Set Output Data Reg)</td>
+              </tr>
+              <tr>
+                <td><strong>Set Pin D13 LOW (1-Cycle Fast I/O)</strong></td>
+                <td><code>PORTB &amp;= ~(1 &lt;&lt; PB7);</code></td>
+                <td><code>PIOB-&gt;PIO_CODR = PIO_PB27;</code> (Clear Output Data Reg)</td>
+              </tr>
+              <tr>
+                <td><strong>Read Pin D13 Input State</strong></td>
+                <td><code>bool state = (PINB &amp; (1 &lt;&lt; PB7));</code></td>
+                <td><code>bool state = (PIOB-&gt;PIO_PDSR &amp; PIO_PB27);</code></td>
+              </tr>
+              <tr>
+                <td><strong>Memory Map: Program Flash</strong></td>
+                <td><code>0x00000 – 0x3FFFF</code> (Separate Flash Bus)</td>
+                <td><code>0x00080000 – 0x000FFFFF</code> (512 KB in Unified 4 GB Map)</td>
+              </tr>
+              <tr>
+                <td><strong>Memory Map: Internal SRAM</strong></td>
+                <td><code>0x0200 – 0x21FF</code> (8 KB Data Space)</td>
+                <td><code>0x20070000 – 0x20087FFF</code> (96 KB Contiguous: 64K + 32K)</td>
+              </tr>
+              <tr>
+                <td><strong>ADC Resolution &amp; LSB Step</strong></td>
+                <td>10-Bit (0–1023), $\Delta V = 4.88\text{ mV}$ @ 5.0V</td>
+                <td>12-Bit (0–4095), $\Delta V = 0.806\text{ mV}$ @ 3.3V</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p><strong>ECE &amp; Embedded Systems Masterclass — Standalone Interactive Learning Module</strong></p>
+      <p style="margin-top: 0.35rem;">Verified against official Microchip/Atmel <strong>ATmega2560 (DS40002211A)</strong> and <strong>ATSAM3X8E (DS60001670 / ARM DDI 0337E Cortex-M3)</strong> Technical Datasheets. Self-contained offline HTML5/CSS3/ES6 file.</p>
+    </div>
+  </footer>
+
+  <!-- EMBEDDED INTERACTIVE JAVASCRIPT ENGINE -->
+  <script>
+    // 1. Theme Toggle
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme');
+      html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    }
+
+    // 2. Download Standalone HTML Self-Exporter
+    function downloadSelf() {
+      const source = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([source], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'arduino_mega_vs_due_masterclass.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // 3. Interactive Pinout Filter
+    function filterPins(category, btnEl) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btnEl.classList.add('active');
+      document.querySelectorAll('#pinGrid .pin-item').forEach(item => {
+        if (category === 'all' || item.getAttribute('data-cat') === category) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    // 4. Interactive Accordion
+    function toggleAccordion(headerBtn) {
+      const item = headerBtn.parentElement;
+      const isOpen = item.classList.contains('open');
+      item.classList.toggle('open');
+      headerBtn.querySelector('span:last-child').textContent = isOpen ? '➕' : '➖';
+    }
+
+    // 5. Canvas Visualizer 1: PWM vs True DAC
+    function drawWaveforms() {
+      const canvas = document.getElementById('dacCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      const rcStrength = parseInt(document.getElementById('rcSlider').value, 10);
+      document.getElementById('rcLabel').textContent = `RC Filter Factor = ${rcStrength} (Ripple: ±${(1.2 / rcStrength).toFixed(2)}V)`;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Grid lines & voltage axis
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      for (let v = 0; v <= 5; v++) {
+        const y = h - 25 - (v / 5.2) * (h - 45);
+        ctx.beginPath();
+        ctx.moveTo(45, y);
+        ctx.lineTo(w - 15, y);
+        ctx.stroke();
+        ctx.fillStyle = '#64748b';
+        ctx.font = '11px monospace';
+        ctx.fillText(v + '.0V', 8, y + 4);
+      }
+
+      const plotW = w - 65;
+      const yOfV = (v) => h - 25 - (v / 5.2) * (h - 45);
+
+      // 1. Mega Digital PWM Carrier (Cyan Dashed)
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      const cycles = 14;
+      for (let x = 0; x <= plotW; x++) {
+        const phase = (x / plotW) * Math.PI * 2;
+        const duty = 0.5 + 0.45 * Math.sin(phase);
+        const carrierPos = ((x / plotW) * cycles) % 1;
+        const vPwm = carrierPos < duty ? 5.0 : 0.0;
+        const px = 45 + x;
+        const py = yOfV(vPwm);
+        if (x === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+
+      // 2. Mega RC-Filtered Sine with Ripple & Phase Delay (Green)
+      ctx.strokeStyle = '#22c55e';
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      for (let x = 0; x <= plotW; x++) {
+        const phase = (x / plotW) * Math.PI * 2;
+        const lag = rcStrength * 0.045;
+        const ripple = (0.65 / rcStrength) * Math.sin(phase * cycles);
+        const vRc = 2.5 + (2.1 - rcStrength * 0.06) * Math.sin(phase - lag) + ripple;
+        const px = 45 + x;
+        const py = yOfV(vRc);
+        if (x === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+
+      // 3. Due True 12-Bit DAC Output (0.55V to 2.75V, Orange)
+      ctx.strokeStyle = '#ff8b00';
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      for (let x = 0; x <= plotW; x++) {
+        const phase = (x / plotW) * Math.PI * 2;
+        const vDac = 1.65 + 1.10 * Math.sin(phase); // 0.55V to 2.75V hardware span
+        const px = 45 + x;
+        const py = yOfV(vDac);
+        if (x === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+
+    // 6. Canvas Visualizer 2: 10-bit vs 12-bit ADC Step Plot
+    function drawAdcPlot() {
+      const canvas = document.getElementById('adcCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      const spanMv = parseInt(document.getElementById('zoomSlider').value, 10);
+      document.getElementById('zoomLabel').textContent = `${spanMv} mV Full-Scale Zoom Window`;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Grid
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 5; i++) {
+        const y = h - 25 - (i / 5) * (h - 45);
+        ctx.beginPath();
+        ctx.moveTo(50, y);
+        ctx.lineTo(w - 15, y);
+        ctx.stroke();
+        ctx.fillStyle = '#64748b';
+        ctx.font = '10px monospace';
+        ctx.fillText(((i / 5) * spanMv).toFixed(1) + 'mV', 4, y + 3);
+      }
+
+      const plotW = w - 65;
+      const yOfMv = (mv) => h - 25 - (mv / spanMv) * (h - 45);
+
+      // Ideal Analog Ramp
+      ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(50, yOfMv(0));
+      ctx.lineTo(50 + plotW, yOfMv(spanMv));
+      ctx.stroke();
+
+      // Mega 10-bit Staircase (4.8876 mV step)
+      const megaStep = 4.8876;
+      ctx.strokeStyle = '#00b8d9';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      for (let x = 0; x <= plotW; x++) {
+        const trueMv = (x / plotW) * spanMv;
+        const quantMv = Math.floor(trueMv / megaStep) * megaStep;
+        const px = 50 + x;
+        const py = yOfMv(quantMv);
+        if (x === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+
+      // Due 12-bit Staircase (0.8059 mV step)
+      const dueStep = 0.8059;
+      ctx.strokeStyle = '#ff8b00';
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      for (let x = 0; x <= plotW; x++) {
+        const trueMv = (x / plotW) * spanMv;
+        const quantMv = Math.floor(trueMv / dueStep) * dueStep;
+        const px = 50 + x;
+        const py = yOfMv(quantMv);
+        if (x === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+
+    // 7. Interactive Calculators
+    function runAdcCalc() {
+      const vin = parseFloat(document.getElementById('adcVin').value);
+      document.getElementById('vInVal').textContent = vin.toFixed(2) + ' V';
+
+      const megaCode = Math.min(1023, Math.round((vin / 5.0) * 1023));
+      const megaRecon = (megaCode / 1023) * 5.0;
+      const megaErrMv = (megaRecon - vin) * 1000;
+
+      let dueStatus = '';
+      if (vin > 3.6) {
+        dueStatus = `<span style="color:#ef4444; font-weight:bold;">🚨 OVERVOLTAGE DAMAGE (&gt;3.6V)! Pin ESD Diode Destroyed!</span>`;
+      } else if (vin > 3.3) {
+        dueStatus = `<span style="color:#f59e0b; font-weight:bold;">⚠️ Saturated at 4095 (&gt;3.3V Warning Zone)</span>`;
+      } else {
+        const dueCode = Math.round((vin / 3.3) * 4095);
+        const dueRecon = (dueCode / 4095) * 3.3;
+        const dueErrMv = (dueRecon - vin) * 1000;
+        const dacOut = 3.3 * ((1 / 6) + (4 / 6) * (dueCode / 4095));
+        dueStatus = `Code = <strong>${dueCode} / 4095</strong> | V_recon = ${dueRecon.toFixed(4)}V (Err: ${dueErrMv.toFixed(2)} mV)<br>Due DAC0 Output for Code ${dueCode}: <strong>${dacOut.toFixed(3)} V</strong> (0.55V–2.75V range)`;
+      }
+
+      document.getElementById('adcCalcOut').innerHTML =
+        `<div><strong>Mega (10-Bit @ 5.0V):</strong> Code = <strong>${megaCode} / 1023</strong> | V_recon = ${megaRecon.toFixed(4)}V (Err: ${megaErrMv.toFixed(2)} mV)</div>` +
+        `<div style="margin-top:0.35rem;"><strong>Due (12-Bit @ 3.3V):</strong> ${dueStatus}</div>`;
+    }
+
+    function runBaudCalc() {
+      const baud = parseInt(document.getElementById('baudSelect').value, 10);
+      // Mega Normal (16x)
+      const ubrrNorm = Math.round(16000000 / (16 * baud)) - 1;
+      const baudNorm = 16000000 / (16 * (ubrrNorm + 1));
+      const errNorm = ((baudNorm - baud) / baud) * 100;
+
+      // Mega Double Speed (8x)
+      const ubrrU2x = Math.round(16000000 / (8 * baud)) - 1;
+      const baudU2x = 16000000 / (8 * (ubrrU2x + 1));
+      const errU2x = ((baudU2x - baud) / baud) * 100;
+
+      // Due (84 MHz / 16x)
+      const cdDue = Math.round(84000000 / (16 * baud));
+      const baudDue = 84000000 / (16 * cdDue);
+      const errDue = ((baudDue - baud) / baud) * 100;
+
+      const badge = (err) => Math.abs(err) <= 2.0
+        ? `<span style="color:#22c55e;">(${err >= 0 ? '+' : ''}${err.toFixed(2)}% ✔ Reliable)</span>`
+        : `<span style="color:#ef4444;">(${err >= 0 ? '+' : ''}${err.toFixed(2)}% ❌ Framing Risk)</span>`;
+
+      document.getElementById('baudCalcOut').innerHTML =
+        `<div><strong>Mega U2X=0:</strong> UBRR=${ubrrNorm} → ${Math.round(baudNorm)} bps ${badge(errNorm)}</div>` +
+        `<div><strong>Mega U2X=1:</strong> UBRR=${ubrrU2x} → ${Math.round(baudU2x)} bps ${badge(errU2x)}</div>` +
+        `<div><strong>Due (84 MHz):</strong> CD=${cdDue} → ${Math.round(baudDue)} bps ${badge(errDue)}</div>`;
+    }
+
+    function runDividerCalc() {
+      const r1 = parseFloat(document.getElementById('r1Input').value) || 1000;
+      const r2 = parseFloat(document.getElementById('r2Input').value) || 1000;
+      const vOut = 5.0 * (r2 / (r1 + r2));
+      const iSinkMa = (5.0 / (r1 + r2)) * 1000;
+
+      let safety = '';
+      if (vOut > 3.6) {
+        safety = `<span style="color:#ef4444; font-weight:bold;">❌ UNSAFE (&gt;3.6V)! Will destroy Arduino Due GPIO!</span>`;
+      } else if (vOut > 3.35) {
+        safety = `<span style="color:#f59e0b; font-weight:bold;">⚠️ Caution: Above 3.3V nominal rail (${vOut.toFixed(2)}V). Increase R1.</span>`;
+      } else if (vOut < 2.31) {
+        safety = `<span style="color:#f59e0b; font-weight:bold;">⚠️ Too Low (&lt;2.31V V_IH_min)! Logic HIGH will not register reliably!</span>`;
+      } else {
+        safety = `<span style="color:#22c55e; font-weight:bold;">✅ SAFE &amp; VALID LOGIC HIGH (2.31V ≤ ${vOut.toFixed(2)}V ≤ 3.30V)</span>`;
+      }
+
+      document.getElementById('dividerCalcOut').innerHTML =
+        `<div><strong>Divider Output (5V In):</strong> V_OUT = <strong>${vOut.toFixed(3)} V</strong> | Sensor Load Current = <strong>${iSinkMa.toFixed(3)} mA</strong></div>` +
+        `<div style="margin-top:0.3rem;">${safety}</div>`;
+    }
+
+    // 8. Interactive 10-Question Quiz Data & Engine
+    const quizData = [
+      {
+        q: "1. What is the maximum voltage that can be safely applied to any Arduino Due (ATSAM3X8E) GPIO pin without risking permanent silicon damage?",
+        level: "Easy // Electrical Safety",
+        options: [
+          "5.0 V (same as Arduino Mega 2560)",
+          "3.3 V nominal (3.6 V absolute maximum)",
+          "5.5 V on digital pins, 3.3 V on analog pins",
+          "12.0 V via internal clamping regulators"
+        ],
+        ans: 1,
+        exp: "Correct! The ATSAM3X8E operates on 3.3V CMOS logic with an absolute maximum GPIO rating of VDDIO + 0.3V = 3.6V. Applying 5V forward-biases the internal ESD protection diodes and permanently damages the chip."
+      },
+      {
+        q: "2. What is the smallest detectable voltage step (1 LSB) of the Arduino Due's ADC when configured to its full native hardware resolution with a 3.3V reference?",
+        level: "Easy // Analog Subsystem",
+        options: [
+          "4.88 mV (10-bit resolution)",
+          "3.22 mV (10-bit resolution at 3.3V)",
+          "0.806 mV (12-bit resolution at 3.3V)",
+          "1.22 mV (12-bit resolution at 5.0V)"
+        ],
+        ans: 2,
+        exp: "Correct! Calling analogReadResolution(12) enables all 12 bits (4096 steps, 0–4095) of the SAM3X8E SAR ADC: ΔV = 3.3V / 4095 ≈ 0.8059 mV (six times finer than the Mega's 4.88 mV step)."
+      },
+      {
+        q: "3. Which statement accurately describes the internal EEPROM capacity of the Arduino Mega 2560 and Arduino Due?",
+        level: "Easy // Memory Organization",
+        options: [
+          "Mega has 4 KB EEPROM; Due has 0 KB internal EEPROM.",
+          "Mega has 4 KB EEPROM; Due has 8 KB internal EEPROM.",
+          "Both boards have 4 KB of internal byte-addressable EEPROM.",
+          "Neither board has EEPROM; both emulate it in SRAM."
+        ],
+        ans: 0,
+        exp: "Correct! The ATmega2560 includes 4 KB of dedicated internal EEPROM, whereas the ATSAM3X8E has zero internal EEPROM (requiring external I2C/SPI EEPROM or Flash emulation)."
+      },
+      {
+        q: "4. When outputting a full-scale 12-bit code (0 to 4095) on the Arduino Due's hardware DAC0 or DAC1 pin, what is the actual output voltage range?",
+        level: "Moderate // True DAC Hardware",
+        options: [
+          "0.00 V to 5.00 V rail-to-rail",
+          "0.00 V to 3.30 V rail-to-rail",
+          "1/6 V_ADVREF to 5/6 V_ADVREF (approx. 0.55 V to 2.75 V)",
+          "-3.30 V to +3.30 V bipolar differential"
+        ],
+        ans: 2,
+        exp: "Correct! Per the ATSAM3X8E datasheet, the internal DAC analog output buffer swings from (1/6)×V_ADVREF to (5/6)×V_ADVREF, which equals 0.55V to 2.75V (a 2.2V span) when V_ADVREF = 3.3V."
+      },
+      {
+        q: "5. Why must a 32-bit volatile variable shared between an ISR and loop() be wrapped in ATOMIC_BLOCK on the Arduino Mega 2560, whereas a single aligned 32-bit read on the Arduino Due is inherently atomic?",
+        level: "Moderate // Concurrency & ISA",
+        options: [
+          "Mega lacks a volatile keyword in avr-gcc.",
+          "Mega is an 8-bit CPU that requires four separate 8-bit load instructions to read a 32-bit variable, allowing an ISR to fire mid-read and cause byte tearing.",
+          "Due disables all interrupts automatically whenever loop() executes.",
+          "Mega stores 32-bit variables in EEPROM instead of SRAM."
+        ],
+        ans: 1,
+        exp: "Correct! On an 8-bit AVR data bus, reading a 32-bit variable takes four sequential 8-bit LDS instructions. An interrupt occurring between bytes corrupts the value unless interrupts are temporarily masked."
+      },
+      {
+        q: "6. An engineer connects a 5.0V digital sensor to an Arduino Due input pin using a series resistor R1 = 2.2 kΩ and a ground resistor R2 = 3.3 kΩ. What is the resulting voltage at the Due pin, and is it safe?",
+        level: "Moderate // Interfacing Calculation",
+        options: [
+          "3.00 V — Safe and valid Logic HIGH (above 2.31V V_IH_min and below 3.3V)",
+          "3.33 V — Unsafe overvoltage",
+          "2.00 V — Safe, but fails to meet V_IH_min (2.31V)",
+          "1.67 V — Too low to register as HIGH"
+        ],
+        ans: 0,
+        exp: "Correct! V_OUT = 5.0V × [3.3 / (2.2 + 3.3)] = 5.0 × (3.3 / 5.5) = 3.00 V. Since SAM3X8E V_IH_min = 0.7 × 3.3V = 2.31V and V_max = 3.6V, 3.00V is completely safe and provides a strong noise margin."
+      },
+      {
+        q: "7. On the Arduino Mega 2560 (16 MHz), what is the exact UBRR register value and baud rate error for 250,000 bps in Normal Asynchronous Mode (16x oversampling, U2X = 0)?",
+        level: "Difficult // GATE / Register Calculation",
+        options: [
+          "UBRR = 8, Error = -3.55%",
+          "UBRR = 3, Error = 0.00%",
+          "UBRR = 16, Error = +2.12%",
+          "UBRR = 7, Error = -1.50%"
+        ],
+        ans: 1,
+        exp: "Correct! UBRR = [16,000,000 / (16 × 250,000)] - 1 = (16,000,000 / 4,000,000) - 1 = 4 - 1 = 3 exactly! Because 4,000,000 divides 16,000,000 with zero remainder, the baud error is 0.00% (which is why 3D printer firmware like Marlin uses 250,000 bps)."
+      },
+      {
+        q: "8. How is the 96 KB of internal SRAM physically organized inside the Arduino Due's ATSAM3X8E microcontroller?",
+        level: "Difficult // Bus Matrix & Memory Map",
+        options: [
+          "Three separate 32 KB banks requiring manual bank-switching registers",
+          "Two banks: 64 KB SRAM0 and 32 KB SRAM1 mapped contiguously so the CPU and DMA can access separate banks simultaneously without bus contention",
+          "16 KB internal cache plus 80 KB external SDRAM",
+          "One 96 KB bank shared with the internal 4 KB EEPROM"
+        ],
+        ans: 1,
+        exp: "Correct! SRAM0 (64 KB mirrored at 0x20070000–0x2007FFFF) abuts SRAM1 (32 KB at 0x20080000–0x20087FFF), forming a contiguous 96 KB space while allowing concurrent AHB master access."
+      },
+      {
+        q: "9. What happens if you try to drive a 20 mA indicator LED directly from Digital Pin 0, 1, or 14 on the Arduino Due?",
+        level: "Moderate // GPIO Current Limits",
+        options: [
+          "It works safely because all Arduino pins are rated for 40 mA.",
+          "It exceeds the 3 mA maximum source current limit of Due's low-drive GPIO pins by over 600%, risking permanent port driver damage.",
+          "The internal polyfuse temporarily disconnects the pin and recovers.",
+          "The pin automatically switches from 3.3V to 5.0V high-current mode."
+        ],
+        ans: 1,
+        exp: "Correct! Low-drive pins on the SAM3X8E are rated to source only 3 mA (and sink 6 mA), while even high-drive pins max out at 15 mA source / 9 mA sink."
+      },
+      {
+        q: "10. To connect an Arduino Due to a 500 kbps automotive CAN bus using its built-in CANRX0 and CANTX0 pins, what additional hardware is required?",
+        level: "Moderate // Automotive Protocols",
+        options: [
+          "No external hardware; CANRX0 and CANTX0 connect directly to CAN_H and CAN_L.",
+          "An external MCP2515 SPI-to-CAN controller chip.",
+          "Only a 3.3V physical-layer CAN transceiver IC (such as SN65HVD230) to convert logic-level CANTX/CANRX signals into differential CAN_H and CAN_L voltages.",
+          "An RS-232 MAX232 voltage doubler."
+        ],
+        ans: 2,
+        exp: "Correct! The ATSAM3X8E already contains two full CAN 2.0A/B protocol controllers (handling framing, arbitration, CRC, and mailboxes), so it only needs a 3.3V differential bus transceiver IC."
+      }
+    ];
+
+    function renderQuiz() {
+      const container = document.getElementById('quizContainer');
+      container.innerHTML = quizData.map((item, idx) => `
+        <div class="quiz-card" id="qcard-${idx}">
+          <div class="quiz-meta">
+            <span style="color: var(--accent-primary); font-weight:700;">QUESTION 0${idx + 1}</span>
+            <span style="color: var(--text-muted);">${item.level}</span>
+          </div>
+          <h4>${item.q}</h4>
+          <div class="quiz-options">
+            ${item.options.map((opt, oIdx) => `
+              <label class="quiz-option">
+                <input type="radio" name="q-${idx}" value="${oIdx}" />
+                <span>${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+          <button class="btn" onclick="checkSingleQuestion(${idx})">Check Answer</button>
+          <div class="quiz-feedback" id="qfeed-${idx}"></div>
+        </div>
+      `).join('');
+    }
+
+    function checkSingleQuestion(idx) {
+      const selected = document.querySelector(`input[name="q-${idx}"]:checked`);
+      const feed = document.getElementById(`qfeed-${idx}`);
+      feed.style.display = 'block';
+
+      if (!selected) {
+        feed.style.background = 'rgba(245, 158, 11, 0.15)';
+        feed.style.borderLeft = '4px solid #f59e0b';
+        feed.innerHTML = `⚠️ Please select an option first.`;
+        return false;
+      }
+
+      const val = parseInt(selected.value, 10);
+      const isCorrect = val === quizData[idx].ans;
+      if (isCorrect) {
+        feed.style.background = 'rgba(34, 197, 94, 0.14)';
+        feed.style.borderLeft = '4px solid #22c55e';
+        feed.innerHTML = `<strong>✅ Correct!</strong> ${quizData[idx].exp}`;
+      } else {
+        feed.style.background = 'rgba(239, 68, 68, 0.14)';
+        feed.style.borderLeft = '4px solid #ef4444';
+        feed.innerHTML = `<strong>❌ Incorrect.</strong> Correct Answer: <em>${quizData[idx].options[quizData[idx].ans]}</em><br>${quizData[idx].exp}`;
+      }
+      return isCorrect;
+    }
+
+    function gradeAllQuiz() {
+      let score = 0;
+      let answered = 0;
+      quizData.forEach((_, idx) => {
+        const selected = document.querySelector(`input[name="q-${idx}"]:checked`);
+        if (selected) answered++;
+        if (checkSingleQuestion(idx)) score++;
+      });
+
+      const scoreEl = document.getElementById('quizScoreText');
+      const sumEl = document.getElementById('quizSummaryText');
+      scoreEl.textContent = `Final Score: ${score} / ${quizData.length} (${score * 10}%)`;
+      scoreEl.style.color = score >= 8 ? 'var(--accent-success)' : (score >= 5 ? 'var(--accent-warning)' : 'var(--accent-danger)');
+      sumEl.textContent = `You answered ${answered} of ${quizData.length} questions. Review the detailed explanations above for any missed items.`;
+    }
+
+    function resetQuiz() {
+      renderQuiz();
+      const scoreEl = document.getElementById('quizScoreText');
+      scoreEl.textContent = 'Current Score: Not Graded Yet';
+      scoreEl.style.color = 'var(--text-primary)';
+      document.getElementById('quizSummaryText').textContent = 'Answer all 10 questions and click "Grade Full Quiz" to see your performance breakdown.';
+    }
+
+    // Initialize everything on load
+    window.addEventListener('DOMContentLoaded', () => {
+      drawWaveforms();
+      drawAdcPlot();
+      runAdcCalc();
+      runBaudCalc();
+      runDividerCalc();
+      renderQuiz();
+    });
+  </script>
+</body>
+</html>
